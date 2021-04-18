@@ -1,18 +1,24 @@
-<html>
-<head>
-<title>My fancy web app</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block pagebody %}
+
+    Insert your username:
+    <form action="/login" method="POST">
+        <input name="user" type="text">
+        <input type="submit">
+    </form>
+
     {% if user %}
-    Welcome to the web app, {{ user }}!
+        Welcome to the web app, {{ user }}!
     {% else %}
-    Welcome to the web app, anonymous! <br/>
-    The following users are registered:
-    <ul>
-    {% for u in reg %}
+        Welcome to the web app, anonymous! <br/>
+        The following users are registered:
+        <ul>
+        {% for u in reg %}
         <li> {{ u }} </li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-</body>
-</html>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+
+
+{% endblock %}
