@@ -21,10 +21,10 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     conn = engine.connect()
-    rs = conn.execute('SELECT * FROM Users WHERE email = ?', user_id)
+    rs = conn.execute('SELECT * FROM Users WHERE id = ?', user_id)
     user = rs.fetchone()
     conn.close()
-    return User(user.id,user .email,user.pwd)
+    return User(user.id,user.email,user.pwd)
 
 @app.route('/')
 def home():
@@ -34,20 +34,23 @@ def home():
 
 
 def get_user_by_email(email):
-    return email
+    conn = engine.connect()
+    rs = conn.execute('SELECT * FROM Users WHERE email = ?', email)
+    user = rs.fetchone()
+    conn.close()
+    return User(user.id, user.email, user.pwd)
 
-
-@app.route ('/login', methods =['GET', 'POST'])
-def login ():
+@app.route('/login', methods =['GET', 'POST'])
+def login():
     if request.method == 'POST':
         conn = engine.connect()
-        rs = conn.execute('SELECT * FROM Users WHERE email = ?', [request.form['user']])
+        rs = conn.execute('SELECT pwd FROM Users WHERE email = ?', [request.form['user']])
         real_pwd = rs.fetchone()
         conn.close()
         if (real_pwd is not None ):
-            if request.form['pass'] == real_pwd['pwd']:
+            if (request.form['pass'] == real_pwd['pwd']):
                 user = get_user_by_email(request.form['user'])
-                login_user(request.form['user'])
+                login_user(user)
                 return redirect(url_for('private'))
             else:
                 return redirect(url_for('home')) # TODO implementare la logica di accesso a DBMS
@@ -62,7 +65,7 @@ def login ():
 def private():
     conn = engine.connect()
     users = current_user.get_id()
-    resp = make_response(render_template(" private.html ", users=users))
+    resp = make_response(render_template("private.html", users=users))
     conn.close()
     return resp
 
