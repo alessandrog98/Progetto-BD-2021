@@ -3,7 +3,21 @@
     <title>My fancy web app</title>
 </head>
 <body>
-    {% block pagebody %}
-    {% endblock %}
+
+<h1> Progetto BASI DI DATI 2021 </h1>
+<p>  Authors : Gasparello Alessando </p>
+<p>            Pizzolato Davide </p>
+<p>            Simonato Alessandro </p>
+{% block pagebody %}
+    Attenzione : Per accedere è necessaria l'autenticazione :
+
+    <form action="/login" method="POST">
+        <input name="user" type="text">
+        <input name="pass" type="password">
+        <input type="submit">
+    </form>
+
+{% endblock %}
+
 </body>
 </html>
