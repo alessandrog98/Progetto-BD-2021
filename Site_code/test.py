@@ -1,7 +1,10 @@
+import flask
+from is_safe_url import is_safe_url
+
 from gendb import engine
 from sqlalchemy import create_engine
 from flask import Flask, render_template, redirect, url_for, request, make_response
-from flask_login import LoginManager, UserMixin, current_user, login_required, login_user
+from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pwd1'
@@ -51,7 +54,11 @@ def login():
             if (request.form['pass'] == real_pwd['pwd']):
                 user = get_user_by_email(request.form['user'])
                 login_user(user)
-                return redirect(url_for('private'))
+                flask.flash('Logged in successfully.')
+                next = request.args.get('next')
+                if not is_safe_url("/private",{"http://127.0.0.1:5000/private"}):    #controllo sicurezza URL passato
+                    return flask.abort(400)
+                return redirect(url_for("private" or url_for('/')))
             else:
                 return redirect(url_for('home')) # TODO implementare la logica di accesso a DBMS
         else :
@@ -59,6 +66,13 @@ def login():
     else:
         return redirect(url_for('home'))
 
+@app.route('/logout')
+@login_required
+def logout():
+    conn = engine.connect()
+    logout_user()
+    conn.close()
+    return redirect(url_for('home'))
 
 @app.route('/private')
 @login_required
@@ -69,9 +83,6 @@ def private():
     conn.close()
     return resp
 
-@app.route('/users')
-def users():
-    return 'if u are a registerd user, please insert the username here: '
 
 @app.route('/users/<username>')
 def show_profile(username):
