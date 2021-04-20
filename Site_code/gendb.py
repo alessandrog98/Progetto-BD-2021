@@ -13,16 +13,14 @@ addresses = Table('addresses', metadata, Column('id', Integer, primary_key=True)
                                          Column('email_address', String, nullable=False))
 
 metadata.create_all(engine)
+conn = engine.connect()
 
 ins = users.insert()
-conn = engine.connect()
-select_users = users.select()
+sel = users.select()
 
-conn.execute(ins, email='sally@gmail.com', pwd='Sally Roberts')
-conn.execute(ins, email='jack@gmail.com', pwd='Jack Jones')
 conn.execute(ins, email='prova', pwd='prova')
 
-for row in conn.execute(select_users):
+for row in conn.execute(sel):
     print(row)
 
 print(str(ins))

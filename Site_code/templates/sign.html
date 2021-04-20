@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block pagebody %}
+<head>
+    <title>Sign_up</title>
+</head>
+<body>
+    <br>
+    <br>
+    <br>
+    <h3> Inserisci qui le tue credenziali d'iscrizione</h3>
+    <p>  Email Password</p>
+    <form action="/signing_up" method="POST">
+        <input name="user" type="text">
+        <input name="pass" type="password">
+        <input type="submit">
+    </form>
+</body>
+</html>
+{% endblock %}

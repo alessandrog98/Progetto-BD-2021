@@ -1,8 +1,9 @@
 import flask
-from is_safe_url import is_safe_url
 
-from gendb import engine
-from sqlalchemy import create_engine
+from is_safe_url import is_safe_url
+from sqlalchemy import bindparam, select
+
+from gendb import engine, ins, users
 from flask import Flask, render_template, redirect, url_for, request, make_response
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 
@@ -29,19 +30,18 @@ def load_user(user_id):
     conn.close()
     return User(user.id,user.email,user.pwd)
 
-@app.route('/')
-def home():
-    if current_user.is_authenticated:
-        return redirect(url_for('private'))
-    return render_template("base.html")
-
-
 def get_user_by_email(email):
     conn = engine.connect()
     rs = conn.execute('SELECT * FROM Users WHERE email = ?', email)
     user = rs.fetchone()
     conn.close()
     return User(user.id, user.email, user.pwd)
+
+@app.route('/')
+def home():
+    if current_user.is_authenticated:
+        return redirect(url_for('private'))
+    return render_template("base.html")
 
 @app.route('/login', methods =['GET', 'POST'])
 def login():
@@ -54,8 +54,8 @@ def login():
             if (request.form['pass'] == real_pwd['pwd']):
                 user = get_user_by_email(request.form['user'])
                 login_user(user)
+                print(user)
                 flask.flash('Logged in successfully.')
-                next = request.args.get('next')
                 if not is_safe_url("/private",{"http://127.0.0.1:5000/private"}):    #controllo sicurezza URL passato
                     return flask.abort(400)
                 return redirect(url_for("private" or url_for('/')))
@@ -82,6 +82,24 @@ def private():
     resp = make_response(render_template("private.html", users=users))
     conn.close()
     return resp
+
+@app.route('/sign_up')
+def sign_up():
+    return render_template("sign.html")
+
+
+@app.route('/signing_up', methods=['GET', 'POST'])
+def signing_up():   #TODO prima versione da sviluppare
+    conn = engine.connect()
+    user = request.form['user']
+    pwd = request.form['pass']
+    rs = conn.execute(select([users]).where(users.c.email == user))
+    user_reg = rs.fetchone()
+    if (user_reg is not None):
+        return redirect(url_for('home'))
+    conn.execute(ins, email=user, pwd=pwd)
+    conn.close()
+    return redirect(url_for('home'))
 
 
 @app.route('/users/<username>')
