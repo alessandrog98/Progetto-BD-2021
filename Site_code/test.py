@@ -37,11 +37,11 @@ def get_user_by_email(email):
     conn.close()
     return User(user.id, user.email, user.pwd)
 
-@app.route('/')
-def home():
+@app.route('/log')
+def log():
     if current_user.is_authenticated:
         return redirect(url_for('private'))
-    return render_template("base.html")
+    return render_template("log.html")
 
 @app.route('/login', methods =['GET', 'POST'])
 def login():
@@ -102,11 +102,7 @@ def signing_up():   #TODO prima versione da sviluppare
     return redirect(url_for('home'))
 
 
-@app.route('/users')
-def show_profile(username):
-    conn = engine.connect()
-    if username in users:
-        return render_template('profile.html', user=username)
-    else:
-        return render_template('profile.html', reg=users)
+@app.route('/')
+def home():
+    return render_template("home.html")
 
