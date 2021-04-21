@@ -62,9 +62,3 @@ conn = engine.connect()
 ins = users.insert()
 sel = users.select()
 
-conn.execute(ins, email='prova', pwd='prova')
-
-for row in conn.execute(sel):
-    print(row)
-
-print(str(ins))

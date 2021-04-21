@@ -25,14 +25,14 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     conn = engine.connect()
-    rs = conn.execute('SELECT * FROM Users WHERE id = ?', user_id)
+    rs = conn.execute(select(users).where(users.c.id == user_id))
     user = rs.fetchone()
     conn.close()
     return User(user.id,user.email,user.pwd)
 
 def get_user_by_email(email):
     conn = engine.connect()
-    rs = conn.execute('SELECT * FROM Users WHERE email = ?', email)
+    rs = conn.execute(select(users).where(users.c.email == email))
     user = rs.fetchone()
     conn.close()
     return User(user.id, user.email, user.pwd)
@@ -47,11 +47,11 @@ def home():
 def login():
     if request.method == 'POST':
         conn = engine.connect()
-        rs = conn.execute('SELECT pwd FROM Users WHERE email = ?', [request.form['user']])
-        real_pwd = rs.fetchone()
+        rs = conn.execute(select(users.c.pwd).where(users.c.email == request.form['user']))
+        password = rs.fetchone()
         conn.close()
-        if (real_pwd is not None ):
-            if (request.form['pass'] == real_pwd['pwd']):
+        if (password is not None ):
+            if (request.form['pass'] == password['pwd']):
                 user = get_user_by_email(request.form['user'])
                 login_user(user)
                 print(user)
@@ -60,8 +60,8 @@ def login():
                     return flask.abort(400)
                 return redirect(url_for("private" or url_for('/')))
             else:
-                return redirect(url_for('home')) # TODO implementare la logica di accesso a DBMS
-        else :
+                return redirect(url_for('home'))
+        else:
             return redirect(url_for('home'))
     else:
         return redirect(url_for('home'))
@@ -93,18 +93,18 @@ def signing_up():   #TODO prima versione da sviluppare
     conn = engine.connect()
     user = request.form['user']
     pwd = request.form['pass']
-    rs = conn.execute(select([users]).where(users.c.email == user))
+    rs = conn.execute(select(users.c.email).where(users.c.email == user))
     user_reg = rs.fetchone()
     if (user_reg is not None):
         return redirect(url_for('home'))
-    conn.execute(ins, email=user, pwd=pwd)
+    conn.execute(ins, email=user, pwd=pwd, IDGruppo=5)
     conn.close()
     return redirect(url_for('home'))
 
 
-@app.route('/users/<username>')
+@app.route('/users')
 def show_profile(username):
-    users = ['alice','bob','charlie']
+    conn = engine.connect()
     if username in users:
         return render_template('profile.html', user=username)
     else:
