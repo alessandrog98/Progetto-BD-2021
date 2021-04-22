@@ -10,3 +10,6 @@ class User(UserMixin):
         self.id = id
         self.email = email
         self.pwd = pwd
+
+    def get_id(self):
+        return self.id

@@ -7,11 +7,6 @@ import datetime
 from sqlalchemy import Column, Integer, DateTime
 from config import conn_str,engine
 
-
-
-
-
-
 engine.execute("SELECT 1")
 metadata = MetaData()
 

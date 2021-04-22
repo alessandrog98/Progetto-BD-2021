@@ -1,15 +1,16 @@
 import flask
-from is_safe_url import is_safe_url
-from sqlalchemy import bindparam, select
+import sqlalchemy
 import datetime
+
+from sqlalchemy import select, Column, Integer, String
+from flask_login import LoginManager, UserMixin, AnonymousUserMixin, current_user, login_user, login_required, logout_user
+from is_safe_url import is_safe_url
 from flask import Flask, render_template, redirect, url_for, request, make_response,Blueprint
-from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 from gendb import users
 from config import conn_str, engine
 from models.users import User
 
 auth = Blueprint('auth', __name__)
-
 
 def get_user_by_email(email):
     conn = engine.connect()
@@ -20,9 +21,9 @@ def get_user_by_email(email):
 
 @auth.route('/log')
 def log():
-    #if current_user.is_authenticated:
-    return redirect(url_for('auth.private'))
-    #return render_template("log.html")
+    if current_user.is_authenticated:
+        return redirect(url_for('auth.private'))
+    return render_template("log.html")
 
 @auth.route('/login', methods =['GET', 'POST'])
 def login():
@@ -39,7 +40,7 @@ def login():
                 flask.flash('Logged in successfully.')
                 if not is_safe_url("/private",{"http://127.0.0.1:5000/private"}):    #controllo sicurezza URL passato
                     return flask.abort(400)
-                return redirect(url_for("auth.private" or url_for('/')))
+                return redirect(url_for('auth.private'))
             else:
                 return redirect(url_for('auth.home'))
         else:
