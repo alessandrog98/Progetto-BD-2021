@@ -1,0 +1,9 @@
+{
+	"Database": {
+              "driver" = "{ODBC Driver 17 for SQL Server}"
+              "server" = "questionario.database.windows.net"
+              "database" = "questionario"
+              "user" = "Kowalskik"
+              "password" = "Lego2233"
+            },
+}

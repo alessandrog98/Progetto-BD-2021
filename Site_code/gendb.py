@@ -5,20 +5,12 @@ from sqlalchemy import create_engine
 import pyodbc as pyodbc
 import datetime
 from sqlalchemy import Column, Integer, DateTime
+from config import conn_str,engine
 
 
-driver = "{ODBC Driver 17 for SQL Server}"
-server = "db-project-2021.database.windows.net"
-database = "DB project 2021"
-user = "Alessandro_878169"
-password = "Progetto2021"
 
-conn = f"""Driver={driver};Server=tcp:{server},1433;Database={database};
-Uid={user};Pwd={password};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"""
 
-params = urllib.parse.quote_plus(conn)
-conn_str = 'mssql+pyodbc:///?odbc_connect={}'.format(params)
-engine = create_engine(conn_str, echo=True)
+
 
 engine.execute("SELECT 1")
 metadata = MetaData()
@@ -27,7 +19,6 @@ users = Table('Users', metadata, Column('id', Integer, primary_key=True),
                                  Column('email', String),
                                  Column('pwd', String),
                                  Column('IDGruppo', Integer),
-                                 Column('DataCreazione', TIMESTAMP(timezone=False), nullable=False, default=datetime.datetime.utcnow)
                                  )
 
 
