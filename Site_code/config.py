@@ -1,14 +1,18 @@
-import urllib
-from sqlalchemy import create_engine
-from dotenv import dotenv_values
+import os
 
-config = dotenv_values("old.env")
+class Config:
+    DEBUG = False
+    DEVELOPMENT = False
+    SECRET_KEY = os.getenv("SECRET_KEY", ")J@NcRfUjXn2r5u8")
 
-driver = "{ODBC Driver 17 for SQL Server}"
+class ProductionConfig(Config):
+    pass
 
-conn = f"""Driver={driver};Server=tcp:{config['DB_ADDRESS']},{config['DB_PORT']};Database={config['DB_NAME']};Uid={config['DB_USER']};Pwd={config['DB_PASSWORD']};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"""
-params = urllib.parse.quote_plus(conn)
-conn_str = 'mssql+pyodbc:///?odbc_connect={}'.format(params)
+class DevelopmentConfig(Config):
+    DEBUG = True
+    DEVELOPMENT = True
 
-
-engine = create_engine(conn_str, echo=True)
+config_dict = {
+    'Dev': DevelopmentConfig,
+    'Production': ProductionConfig
+}
