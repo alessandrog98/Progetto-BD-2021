@@ -1,13 +1,14 @@
 import flask
-import sqlalchemy
 import datetime
 
-from sqlalchemy import select, Column, Integer, String
-from flask_login import LoginManager, UserMixin, AnonymousUserMixin, current_user, login_user, login_required, logout_user
+from sqlalchemy import select
+from flask_login import current_user, login_user, login_required, logout_user
 from is_safe_url import is_safe_url
-from flask import Flask, render_template, redirect, url_for, request, make_response,Blueprint
+from flask import render_template, redirect, url_for, request, make_response,Blueprint
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from gendb import users
-from config import conn_str, engine
+from config import engine
 from models.users import User
 
 auth = Blueprint('auth', __name__)
@@ -25,15 +26,20 @@ def log():
         return redirect(url_for('auth.private'))
     return render_template("log.html")
 
+
+class LoginForm(object):
+    pass
+
+
 @auth.route('/login', methods =['GET', 'POST'])
 def login():
     if request.method == 'POST':
         conn = engine.connect()
         rs = conn.execute(select(users.c.pwd).where(users.c.email == request.form['user']))
-        password = rs.fetchone()
+        pwd = rs.fetchone()
         conn.close()
-        if (password is not None ):
-            if (request.form['pass'] == password['pwd']):
+        if (pwd is not None ):
+            if (check_password_hash(pwd['pwd'], request.form['pass'])):
                 user = get_user_by_email(request.form['user'])
                 login_user(user, remember=True, duration=datetime.timedelta(minutes=20))
                 print(user)
@@ -76,12 +82,12 @@ def sign_up():
 def signing_up():   #TODO prima versione da sviluppare
     conn = engine.connect()
     user = request.form['user']
-    pwd = request.form['pass']
+    pwd_hash = generate_password_hash(request.form['pass'])
     rs = conn.execute(select(users.c.email).where(users.c.email == user))
     user_reg = rs.fetchone()
     if (user_reg is not None):
         return redirect(url_for('auth.home'))
-    conn.execute(users.insert(), email=user, pwd=pwd, IDGruppo=5)
+    conn.execute(users.insert(), email=user, pwd=pwd_hash, IDGruppo=5)
     conn.close()
     return redirect(url_for('auth.home'))
 

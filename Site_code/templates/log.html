@@ -8,9 +8,21 @@
     <p> per effetturare l'autenticazione è necessario fornire le proprie credenziali d'accesso:</p>
     <p> Email                  Password </p>
     <form action="/login" method="POST">
-        <input name="user" type="text">
-        <input name="pass" type="password">
-        <input type="submit">
+        <p>
+            {{ form.username(size=28) }}<br>
+            {% for error in form.username.errors %}
+            <span style="color: blue;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=28) }}<br>
+            {% for error in form.password.errors %}
+            <span style="color: blue;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        <p>{{ form.submit() }}</p>
     </form>
 
 {% endblock %}

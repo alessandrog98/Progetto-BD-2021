@@ -1,5 +1,7 @@
 from flask_login import UserMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class User(UserMixin):
     id = Column(Integer,primary_key=True)
