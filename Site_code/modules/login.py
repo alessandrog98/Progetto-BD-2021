@@ -24,7 +24,7 @@ def get_user_by_email(email):
 def log():
     if current_user.is_authenticated:
         return redirect(url_for('auth.private'))
-    return render_template("log.html")
+    return render_template("accounts/login.html")
 
 
 class LoginForm(object):
@@ -75,7 +75,7 @@ def private():
 
 @auth.route('/sign_up')
 def sign_up():
-    return render_template("sign.html")
+    return render_template("accounts/register.html")
 
 
 @auth.route('/signing_up', methods=['GET', 'POST'])
