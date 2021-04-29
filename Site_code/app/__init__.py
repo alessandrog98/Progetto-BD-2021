@@ -3,12 +3,14 @@ from importlib import import_module
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
+from Site_code.gendb import generaDB
 
-db = SQLAlchemy()
+
 login_manager = LoginManager()
 
 def register_extensions(app):
-    db.init_app(app)
+    #db.init_app(app)
     login_manager.init_app(app)
 
 def register_blueprints(app):
@@ -20,15 +22,17 @@ def configure_database(app):
 
     @app.before_first_request
     def initialize_database():
-        db.create_all()
+        tst=0
 
     @app.teardown_request
     def shutdown_session(exception=None):
-        db.session.remove()
+        ts=0
 
 def create_app(config):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(config)
+    generaDB(app)
+
     return app
 
 

@@ -1,9 +1,18 @@
 import os
+from decouple import config
 
 class Config:
     DEBUG = False
     DEVELOPMENT = False
     SECRET_KEY = os.getenv("SECRET_KEY", ")J@NcRfUjXn2r5u8")
+    SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
+        config('DB_ENGINE'),
+        config('DB_USER'),
+        config('DB_PASSWORD'),
+        config('DB_ADDRESS'),
+        config('DB_PORT'),
+        config('DB_NAME')
+    )
 
 class ProductionConfig(Config):
     pass
