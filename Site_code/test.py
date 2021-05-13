@@ -7,8 +7,6 @@ from gendb import engine, ins, users
 from flask import Flask, render_template, redirect, url_for, request, make_response
 from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'pwd1'
 
 login_manager = LoginManager()
 login_manager.init_app(app)

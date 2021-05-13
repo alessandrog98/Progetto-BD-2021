@@ -5,3 +5,6 @@ flask-login~=0.5.0
 pyodbc
 is_safe_url
 python-dotenv
+python-decouple
+flask_sqlalchemy
+psycopg2

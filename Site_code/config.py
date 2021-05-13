@@ -1,6 +1,7 @@
 import os
 from decouple import config
 
+
 class Config:
     DEBUG = False
     DEVELOPMENT = False
@@ -14,12 +15,15 @@ class Config:
         config('DB_NAME')
     )
 
+
 class ProductionConfig(Config):
     pass
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
     DEVELOPMENT = True
+
 
 config_dict = {
     'Dev': DevelopmentConfig,

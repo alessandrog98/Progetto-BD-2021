@@ -7,8 +7,7 @@ import datetime
 from sqlalchemy import Column, Integer, DateTime
 
 
-
-def generaDB(app) :
+def generaDB(app):
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     engine.execute("SELECT 1")
     metadata = MetaData()
@@ -19,14 +18,12 @@ def generaDB(app) :
                                      Column('IDGruppo', Integer),
                                      )
 
-
-
     addresses = Table('addresses', metadata, Column('id', Integer, primary_key=True),
                                              Column('user_id', None, ForeignKey('Users.id')),
                                              Column('email_address', String, nullable=False)
                                              )
 
-    permission= Table('permissions',metadata,
+    permission = Table('permissions',metadata,
                                     Column('id', Integer, primary_key=True),
                                      Column('IDGruppo', Integer),
                                      Column('Tabella', String),
@@ -37,7 +34,7 @@ def generaDB(app) :
                                      Column('Condizione', String),
                                      Column('DataCreazione', TIMESTAMP(timezone=False), nullable=False, default=datetime.datetime.utcnow)
     )
-    sessions= Table('sessions',metadata,
+    sessions = Table('sessions',metadata,
                         Column('ID', Integer, primary_key=True),
                          Column('Token', String),
                          Column('IDUser', Integer),
