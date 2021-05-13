@@ -32,4 +32,5 @@ if __name__ == "__main__":
     import models
     context.SQLBase.metadata.create_all(context.engine)
 
+    import test
     context.app.run()
