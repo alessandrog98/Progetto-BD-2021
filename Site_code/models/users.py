@@ -1,10 +1,10 @@
 from flask_login import UserMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table
 from werkzeug.security import generate_password_hash, check_password_hash
-from context import context
+from context import SQLBase, login_manager, Session
 
 
-class User(UserMixin, context.SQLBase):
+class User(UserMixin, SQLBase):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -18,4 +18,9 @@ class User(UserMixin, context.SQLBase):
         self.pwd = pwd
 
     def get_id(self):
-        return self.id
+        return str(self.id)
+
+    @staticmethod
+    @login_manager.user_loader
+    def load_user(id):
+        return Session().query(User).filter_by(id=int(id)).first()
