@@ -20,7 +20,7 @@ def log():
 def login():
     if request.method == 'POST':
         user = User.get_by_email(request.form['user'])
-        if user is not None and request.form['pass'] == user.password:
+        if user is not None and user.check_password(request.form['pass']):
             login_user(user)
             flask.flash('Logged in successfully.')
             return redirect(url_for("private" or url_for('/')))
@@ -45,7 +45,15 @@ def private():
 
 @app.route('/sign_up')
 def sign_up():
-    return render_template("sign.html")
+    # a = User()
+    # a.name = "admin"
+    # a.email = "admin"
+    # a.set_password("1234")
+    # from context import Session
+    # s = Session()
+    # s.add(a)
+    # s.commit()
+    return redirect(url_for('home'))
 
 
 # @app.route('/signing_up', methods=['GET', 'POST'])

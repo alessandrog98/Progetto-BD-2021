@@ -2,7 +2,7 @@ from flask_login import UserMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from Site_code.context import SQLBase, login_manager, Session
+from context import SQLBase, login_manager, Session
 
 
 class User(UserMixin, SQLBase):

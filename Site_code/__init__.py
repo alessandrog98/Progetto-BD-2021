@@ -8,10 +8,6 @@ from sqlalchemy.orm import sessionmaker
 
 from config import config_dict
 
-
-
-
-
 def register_extensions(app):
     from context import login_manager
     login_manager.init_app(app)
@@ -43,8 +39,10 @@ def create_app():
     context.login_manager = LoginManager(context.app)
     context.login_manager.init_app(context.app)
 
-    import Site_code.models
+    import models
+    import test
 
+    context.SQLBase.metadata.bind = context.engine
     context.SQLBase.metadata.create_all(context.engine)
 
     return context.app
