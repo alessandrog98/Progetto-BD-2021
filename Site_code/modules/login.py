@@ -6,16 +6,15 @@ from flask_login import current_user, login_user, login_required, logout_user
 from is_safe_url import is_safe_url
 from flask import render_template, redirect, url_for, request, make_response,Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
+from Site_code.models.users import User
+from Site_code.context import engine
 
-from gendb import users
-from config import engine
-from models.users import User
 
 auth = Blueprint('auth', __name__)
 
 def get_user_by_email(email):
     conn = engine.connect()
-    rs = conn.execute(select(users).where(users.c.email == email))
+    rs = conn.execute(select(User).where(User.c.email == email))
     user = rs.fetchone()
     conn.close()
     return User(user.id, user.email, user.pwd)
@@ -35,7 +34,7 @@ class LoginForm(object):
 def login():
     if request.method == 'POST':
         conn = engine.connect()
-        rs = conn.execute(select(users.c.pwd).where(users.c.email == request.form['user']))
+        rs = conn.execute(select(User.c.pwd).where(User.c.email == request.form['user']))
         pwd = rs.fetchone()
         conn.close()
         if (pwd is not None ):
@@ -83,11 +82,11 @@ def signing_up():   #TODO prima versione da sviluppare
     conn = engine.connect()
     user = request.form['user']
     pwd_hash = generate_password_hash(request.form['pass'])
-    rs = conn.execute(select(users.c.email).where(users.c.email == user))
+    rs = conn.execute(select(User.c.email).where(User.c.email == user))
     user_reg = rs.fetchone()
     if (user_reg is not None):
         return redirect(url_for('auth.home'))
-    conn.execute(users.insert(), email=user, pwd=pwd_hash, IDGruppo=5)
+    conn.execute(User.insert(), email=user, pwd=pwd_hash, IDGruppo=5)
     conn.close()
     return redirect(url_for('auth.home'))
 

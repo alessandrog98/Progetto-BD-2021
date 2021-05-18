@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table
 from sqlalchemy.orm import relationship
 
-from context import SQLBase, Session
+from Site_code.context import SQLBase, Session
 
 
 class Survey(SQLBase):

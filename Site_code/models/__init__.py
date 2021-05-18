@@ -1,9 +1,1 @@
-import models.answer
-import models.answer_open
-import models.answer_closed
-import models.question
-import models.question_open
-import models.question_closed
-import models.question_closed_option
-import models.survey
-import models.users
+from Site_code.models.users import User
