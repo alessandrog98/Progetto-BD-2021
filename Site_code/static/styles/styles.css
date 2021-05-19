@@ -133,12 +133,27 @@ span {
 .menu-toggle:hover {
   background: #343a40;
 }
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 #Banner {
   position: relative;
   height: 100vh;
-  background: linear-gradient(274deg, #46c8d0, #6262e2 44%, #c962f7);
-  color: #fff;
+  background: linear-gradient(-45deg, #7918fa, #bf54d7, #49b0e5, #11ecb9);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
 }
+
 #Banner .content-wrap {
   position: absolute;
   top: 50%;
@@ -164,6 +179,7 @@ span {
 #Banner .btn-primary:hover {
 	background-color: #07bcab;
 }
+
 #Services {
   background-color: #fafafa;
 }
