@@ -6,8 +6,8 @@ from flask_login import current_user, login_user, login_required, logout_user
 from is_safe_url import is_safe_url
 from flask import render_template, redirect, url_for, request, make_response,Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
-from Site_code.models.users import User
-from Site_code.context import engine
+from models.users import User
+from context import engine
 
 
 auth = Blueprint('auth', __name__)

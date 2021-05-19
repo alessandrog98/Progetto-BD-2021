@@ -3,17 +3,17 @@ import flask
 from is_safe_url import is_safe_url
 from sqlalchemy import bindparam, select
 
-from context import app, login_manager, engine
+from context import app, login_manager, engine, Session
+from models import users
 from models.users import User
 from flask import render_template, redirect, url_for, request, make_response
 from flask_login import current_user, login_required, login_user, logout_user
-
 
 @app.route('/log')
 def log():
     if current_user.is_authenticated:
         return redirect(url_for('private'))
-    return render_template("log.html")
+    return render_template("accounts/login.html")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -45,31 +45,24 @@ def private():
 
 @app.route('/sign_up')
 def sign_up():
-    # a = User()
-    # a.name = "admin"
-    # a.email = "admin"
-    # a.set_password("1234")
-    # from context import Session
-    # s = Session()
-    # s.add(a)
-    # s.commit()
-    return redirect(url_for('home'))
+    return render_template("accounts/register.html")
 
 
-# @app.route('/signing_up', methods=['GET', 'POST'])
-# def signing_up():   #TODO prima versione da sviluppare
-#     conn = engine.connect()
-#     user = request.form['user']
-#     pwd = request.form['pass']
-#     rs = conn.execute(select(users.c.email).where(users.c.email == user))
-#     user_reg = rs.fetchone()
-#     if (user_reg is not None):
-#         return redirect(url_for('home'))
-#     conn.execute(ins, email=user, pwd=pwd, IDGruppo=5)
-#     conn.close()
-#     return redirect(url_for('home'))
+@app.route('/signing_up', methods=['GET', 'POST'])
+def signing_up():
+     email = request.form['user']
+     pwd = request.form['pass']
+     s = Session()
+     user_reg = User.get_by_email(email)
+     if (user_reg is not None):
+         return redirect(url_for('home'))
+     new_user = User(email = email, name = email)
+     new_user.set_password(pwd)
+     s.add(new_user)
+     s.commit()
+     return redirect(url_for('home'))
 
 
 @app.route('/')
 def home():
-    return render_template("home.html")
+    return render_template("index.html")
