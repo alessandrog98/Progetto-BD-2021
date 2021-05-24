@@ -1,22 +1,7 @@
-{% extends "base1.html" %}
-{% block pagebody %}
- <title>Home</title>
-    <br>
-    <br>
-    <br>
-    <h3>Progetto DB 2021</h3>
-    <h4>Benvenuto </h4> nella nostra piattaforma di creazione questionari </p>
-    <br>
-    <p>Per sfruttare in maniera completa i nostri serivizi effettua l'iscizione :</p>
-    <form action="/sign_up" method="GET">
-        <input type="submit">
-    </form>
-    <br>
-    <p>O se sei già iscritto effettua il login</p>
-    <form action="/login" method="POST">
-        <input name="user" type="text">
-        <input name="pass" type="password">
-        <input type="submit">
-    </form>
+{% extends "base_generic.html" %}
 
+{% block head %}
+{% endblock %}
+
+{% block content %}
 {% endblock %}

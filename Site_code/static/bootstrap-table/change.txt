@@ -1,0 +1,54 @@
+In js/bootstrap-table.min.js
+
+	var b=3 cambiato in var b=4
+
+	---
+
+	4: {
+
+            buttonsClass: 'secondary',
+
+            iconsPrefix: 'fa', ==> fas
+
+            icons: {
+
+                paginationSwitchDown: 'fa-toggle-down', ==> fa-caret-square-down
+                paginationSwitchUp: 'fa-toggle-up', ==> fa-caret-square-up
+
+                refresh: 'fa-refresh', fa-sync
+
+                toggleOff: 'fa-toggle-off',
+
+                toggleOn: 'fa-toggle-on',
+                columns: 'fa-th-list',
+
+                detailOpen: 'fa-plus',
+
+                detailClose: 'fa-minus',
+
+                fullscreen: 'fa-arrows-alt' ==> fa-expand-arrows-alt
+
+            },
+
+	---
+
+	Substitute all the occurency of formatAllRows() with "All" to prevent Error in pagination when language is switched
+
+###
+
+In js/bootstrap-table-locale.min.js
+
+	Put English in last position so it becomes the default language
+
+	---
+
+	Set language['en-en'] also to language.en (For all language)
+		Search = (fn\.bootstrapTable\.locales\['(.{2})-(.{2})'\] = )
+		Replace = $1 $.fn.bootstrapTable.locales.$2 =
+
+###
+
+In css/bootstrap-table.min.css {{ DEPRECATED }}
+	"Selected" overwrite bootstrap background
+	From .fixed-table-container .table tbody tr.selected td{background-color:rgba(0,0,0,0.075)}
+	To   .fixed-table-container .table tbody tr.selected td{}

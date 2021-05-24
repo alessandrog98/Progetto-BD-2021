@@ -25,6 +25,9 @@ class User(UserMixin, SQLBase):
     def get_id(self):
         return str(self.id)
 
+    def get_full_name(self):
+        return self.name.capitalize()
+
     @staticmethod
     def get_by_email(email):
         return Session().query(User).filter_by(email=email).first()

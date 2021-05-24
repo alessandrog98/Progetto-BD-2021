@@ -8,9 +8,11 @@ from sqlalchemy.orm import sessionmaker
 
 from config import config_dict
 
-def register_extensions(app):
-    from context import login_manager
-    login_manager.init_app(app)
+
+# def register_extensions(app):
+#     from context import login_manager
+#     login_manager.init_app(app)
+
 
 def register_blueprints(app):
     from modules.login import auth
@@ -40,7 +42,8 @@ def create_app():
     context.login_manager.init_app(context.app)
 
     import models
-    import test
+    import context_processor
+    register_blueprints(context.app)
 
     context.SQLBase.metadata.bind = context.engine
     context.SQLBase.metadata.create_all(context.engine)

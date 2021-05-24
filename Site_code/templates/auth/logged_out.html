@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ static('css/logged_out.css') }}">
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% set home = url_for('auth.home') %}
+
+{% block content %}
+<div class="row justify-content-center form">
+  <h4 class="mb-3 mt-3 font-weight-normal" style="text-align: center;">Logged out</h4>
+  <a class="btn btn-lg btn-primary btn-block" href="{{ home }}">Home Page</a>
+  <!--<div style="height: 250px;"></div>-->
+</div>
+{% endblock %}
