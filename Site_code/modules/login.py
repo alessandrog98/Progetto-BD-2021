@@ -2,9 +2,7 @@ import flask
 import datetime
 
 from flask_login import current_user, login_user, login_required, logout_user
-from is_safe_url import is_safe_url
 from flask import render_template, redirect, url_for, request, make_response, Blueprint
-from sqlalchemy.orm import session
 
 from context import Session
 from models.users import User
@@ -22,7 +20,7 @@ def login():
         if user is not None and user.check_password(request.form['pass']):
             login_user(user, remember=True, duration=datetime.timedelta(minutes=20))
             flask.flash('Logged in successfully.')
-            return redirect(url_for("auth.private"))
+            return redirect(url_for("front.home"))
         else:
             return redirect(url_for('auth.login'))
 
@@ -51,39 +49,29 @@ def password_change():
                 user.set_password(new1)
                 s.commit()
                 return render_template("auth/password_change_done.html")
-
-        return render_template("auth/password_change_form.html")
-
-
-@auth.route('/private')
-@login_required
-def private():
-    users = current_user.get_id()
-    resp = make_response(render_template("private.html", users=users))
-    return resp
+            else:
+                # TODO Show error password mismatch
+                return render_template("auth/password_change_form.html")
+        else:
+            # TODO Show error wrong old password
+            return render_template("auth/password_change_form.html")
 
 
-@auth.route('/sign_up')
+@auth.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
-    return render_template("accounts/register.html")
+    if request.method == 'GET':
+        return render_template("auth/register.html")
+    else:
+        email = request.form['user']
+        pwd = request.form['pass']
+        s = Session()
+        if User.get_by_email(email) is not None:
+            # TODO Show error email already used
+            pass
+        new_user = User(email=email, name=email)
+        new_user.set_password(pwd)
+        s.add(new_user)
+        s.commit()
+        return redirect(url_for('home'))
 
-
-@auth.route('/signing_up', methods=['GET', 'POST'])
-def signing_up():   # TODO prima versione da sviluppare
-    pass
-    # conn = engine.connect()
-    # user = request.form['user']
-    # pwd_hash = generate_password_hash(request.form['pass'])
-    # rs = conn.execute(select(User.c.email).where(User.c.email == user))
-    # user_reg = rs.fetchone()
-    # if (user_reg is not None):
-    #     return redirect(url_for('auth.home'))
-    # conn.execute(User.insert(), email=user, pwd=pwd_hash, IDGruppo=5)
-    # conn.close()
-    # return redirect(url_for('auth.home'))
-
-
-@auth.route('/')
-def home():
-    return render_template("home.html")
 

@@ -5,7 +5,6 @@ from decouple import config
 from flask_login import LoginManager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from config import config_dict
 
 
@@ -15,17 +14,21 @@ from config import config_dict
 
 
 def register_blueprints(app):
+    from modules.front import front
     from modules.login import auth
-    app.register_blueprint(auth)
+    from modules.surveys import surveys
+    app.register_blueprint(front, url_prefix='/')
+    app.register_blueprint(auth, url_prefix='/account')
+    app.register_blueprint(surveys, url_prefix='/surveys')
 
 
 def create_app():
-
     DEV = config('Dev', default=True)
 
     # The configuration
     get_config_mode = 'Dev' if DEV else 'Production'
 
+    app_config = None
     try:
         # Load the configuration using the default values
         app_config = config_dict[get_config_mode.capitalize()]

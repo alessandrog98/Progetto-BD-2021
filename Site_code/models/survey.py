@@ -9,7 +9,7 @@ class Survey(SQLBase):
 
     id = Column(Integer, primary_key=True)
     permit_anon_answer = Column(Boolean)
-    title = Column(String(150))
+    title = Column(String(250))
 
     author_id = Column(Integer, ForeignKey("users.id"))
     author = relationship("User", back_populates="surveys")
