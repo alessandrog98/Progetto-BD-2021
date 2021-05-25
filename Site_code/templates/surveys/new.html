@@ -1,12 +1,18 @@
 {% extends "base_generic.html" %}
 
 {% block head %}
+    <script src="{{ static('js/surveys_new.js') }}"></script>
 {% endblock %}
 
 {% set home = url_for('front.home') %}
 
 {% block content %}
     <style>
+        body
+        {
+            margin-bottom: 70px;
+        }
+
         .myLabel
         {
             width: 200px;
@@ -26,43 +32,18 @@
         </div>
         <div class="form-inline mt-3">
             <label class="myLabel font-weight-bold">Anonymous answers:</label>
-            <input id="permit_anon_true" type="radio" name="permit_anon" value="true" class="form-control">
+            <input id="permit_anon_true" type="radio" name="permit_anon" value="true">
             <label for="permit_anon_true" style="padding-left: 5px; padding-right: 20px;">Permit</label><br>
-            <input id="permit_anon_false" type="radio" name="permit_anon" value="false" class="form-control" checked>
+            <input id="permit_anon_false" type="radio" name="permit_anon" value="false" checked>
             <label for="permit_anon_false" style="padding-left: 5px; padding-right: 20px;" >Deny</label>
         </div><hr>
     </div>
 
-    <h4>Questions</h4>
 
-    <div class="row mt-2 mb-2">
-        <div class="col"><hr></div>
-        <div class="col-auto btn-group">
-            <button class="btn btn-success" role="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add new close-ended question">
-                <i class="fas fa-plus"></i> <i class="fas fa-list-alt"></i>
-            </button>
-            <button class="btn btn-success" role="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add new open-ended question">
-                <i class="fas fa-plus"></i> <i class="fas fa-i-cursor"></i>
-            </button>
-        </div>
-        <div class="col"><hr></div>
+    <div id="itemsContainer" class="col-xl-10 ml-auto mr-auto">
+        <h4>Questions</h4>
     </div>
 
-    <div class="card" style="height: 150px">
-    </div>
-
-    <div class="row mt-2 mb-2">
-        <div class="col"><hr></div>
-        <div class="col-auto btn-group">
-            <button class="btn btn-success" role="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add new close-ended question">
-                <i class="fas fa-plus"></i> <i class="fas fa-list-alt"></i>
-            </button>
-            <button class="btn btn-success" role="button" data-toggle="tooltip" data-placement="top" title="" data-original-title="Add new open-ended question">
-                <i class="fas fa-plus"></i> <i class="fas fa-i-cursor"></i>
-            </button>
-        </div>
-        <div class="col"><hr></div>
-    </div>
 
     <div class="row justify-content-center align-items-center fixed-bottom" style="background-color: #d3d3d3; height: 70px">
         <div class="col-auto">
