@@ -11,6 +11,7 @@ class OpenQuestion(SQLBase):
     question = relationship("Question", back_populates="open_question")
 
     regex = Column(String(200), nullable=True)
+    regex_description = Column(String(200), nullable=True)
 
     open_answers = relationship("OpenAnswer", back_populates="open_question")
 
