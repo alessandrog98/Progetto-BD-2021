@@ -73,11 +73,14 @@ class SurveysItem {
         html += '        </div>';
         html += '    </div>';
         html += '    <div class="card-body">';
-        html += '        <h5 class="card-title">Special title treatment</h5>';
-        html += '        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>';
-        html += '       <a href="#" class="btn btn-primary">Go somewhere</a>';
-        html += '   </div>';
-        html += '   <div class="card-footer">';
+        html += '       <div class="form-inline mb-2">';
+        html += '           <label class="font-weight-bold pr-3">Description:</label>';
+        html += '           <input class="form-control item-description" type="text"/>';
+        html += '       </div>';
+        html += '       <div class="my-card-body">';
+        html += '       </div>';
+        html += '    </div>';
+        html += '    <div class="card-footer">';
         html += '       <div class="row justify-content-between">';
         html += '           <div class="col-auto ">';
         html += '               <select class="form-control mr-2 item-cmd-type">';
@@ -94,7 +97,7 @@ class SurveysItem {
         html += '   </div>';
         html += '</div>';
         this.$container = $(html);
-        this.$body = this.$container.find('.card-body');
+        this.$body = this.$container.find('.my-card-body');
         this.$select_type = this.$container.find('.item-cmd-type');
         this.$btn_delete = this.$container.find('.item-cmd-delete');
         this.$btn_up = this.$container.find('.item-cmd-up');
@@ -143,6 +146,10 @@ class SurveysItem {
         this.$container.remove();
         this.addButton.remove();
         items.splice(items.indexOf(this), 1); //Remove item
+
+        for (let i = 0; i < items.length; i++) {
+            items[i].setButtonVisibility(i);
+        }
     }
 
     type_change() {
@@ -153,6 +160,8 @@ class SurveysItem {
             let html = '';
             if (type === "1") //Open-ended Question
             {
+                that.$chk_mandatory.parent().removeAttr('hidden');
+
                 html += '<div class="form-inline">';
                 html += '   <label class="font-weight-bold pr-3">Select answer type:</label>';
                 html += '   <select class="form-control item-openType">';
@@ -162,12 +171,12 @@ class SurveysItem {
                 html += '       <option value="custom">Custom</optionval>';
                 html += '   </select>';
                 html += '</div>';
-                html += '<div class="mt-2 item-customRegexContainer" hidden="hidden">';
-                html += '   <div class="form-inline">';
+                html += '<div class="item-customRegexContainer" hidden="hidden">';
+                html += '   <div class="form-inline mt-2">';
                 html += '       <label class="font-weight-bold pr-3">Insert custom Regex:</label>';
                 html += '       <input class="form-control item-customRegex" type="text"/>';
                 html += '   </div>';
-                html += '   <div class="form-inline">';
+                html += '   <div class="form-inline mt-2">';
                 html += '       <label class="font-weight-bold pr-3">Insert Regex description:</label>';
                 html += '       <input class="form-control item-customRegexDescription" type="text"/>';
                 html += '   </div>';
@@ -187,33 +196,48 @@ class SurveysItem {
             }
             else if (type === "2") //Closed-ended Question
             {
+                that.$chk_mandatory.parent().attr('hidden', 'hidden');
+
                 let option = '';
                 option += '    <tr>';
                 option += '      <td><input type="text" class="form-control item-option"/></td>';
                 option += '      <td><button class="btn btn-sm btn-danger item-cmd-removeOption" type="button"><i class="fas fa-times fa-fw"></i></button></td>';
                 option += '    </tr>';
 
-                html += '<table class="table table-striped table-bordered">';
+
+                html += '   <div class="form-inline mt-2">';
+                html += '       <label class="font-weight-bold pr-3">Min n. of choice:</label>';
+                html += '       <input class="form-control item-minChoice" value="1" min="0" type="number"/>';
+                html += '   </div>';
+                html += '   <div class="form-inline mt-2">';
+                html += '       <label class="font-weight-bold pr-3">Max n. of choice</label>';
+                html += '       <input class="form-control item-maxChoice" value="1" min="1" type="number"/>';
+                html += '   </div>';
+                html += '<table class="table table-striped table-bordered mt-2">';
                 html += '  <thead>';
                 html += '    <tr>';
                 html += '      <th scope="col">Option</th>';
                 html += '      <th scope="col"><button class="btn btn-sm btn-success item-cmd-insertOption" type="button"><i class="fas fa-plus fa-fw"></i></button></th>';
                 html += '    </tr>';
                 html += '  </thead>';
-                html += '  <tbody>';
-                html +=         option;
+                html += '  <tbody>';option += '    <tr>';
+                html += '      <td><input type="text" class="form-control item-option"/></td>';
+                html += '      <td></td>';
+                html += '    </tr>';
                 html += '  </tbody>';
                 html += '</table>';
 
 
-                let deleteButtonsEvent = function (evt)
-                {
-                    $(evt.target).closest("tr").remove();
-                };
 
                 that.$body.html(html);
                 that.$addButton = that.$body.find('.item-cmd-insertOption');
                 that.$tbody = that.$body.find('tbody');
+
+                let deleteButtonsEvent = function (evt)
+                {
+                    $(evt.target).closest("tr").remove();
+                    that.$body.find("table").removeClass("table-striped").addClass("table-striped");
+                };
 
                 that.$deleteButtons = that.$body.find('.item-cmd-removeOption');
                 that.$deleteButtons.off('click').click(deleteButtonsEvent);
@@ -223,6 +247,8 @@ class SurveysItem {
 
                     that.$deleteButtons = that.$body.find('.item-cmd-removeOption');
                     that.$deleteButtons.off('click').click(deleteButtonsEvent);
+
+                    that.$body.find("table").removeClass("table-striped").addClass("table-striped");
                 });
             }
 
