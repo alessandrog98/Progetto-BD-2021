@@ -17,3 +17,4 @@ class Question(SQLBase):
 
     closed_question = relationship("ClosedQuestion", uselist=False, back_populates="question")
     open_question = relationship("OpenQuestion", uselist=False, back_populates="question")
+

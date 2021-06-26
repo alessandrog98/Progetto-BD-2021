@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, DDL, event
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from context import SQLBase, login_manager, Session
@@ -36,3 +36,4 @@ class User(UserMixin, SQLBase):
     @login_manager.user_loader
     def load_user(id):
         return Session().query(User).filter_by(id=int(id)).first()
+
