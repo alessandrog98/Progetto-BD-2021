@@ -2,7 +2,7 @@ import flask
 import datetime
 
 from flask_login import current_user, login_user, login_required, logout_user
-from flask import render_template, redirect, url_for, request, make_response, Blueprint
+from flask import render_template, redirect, url_for, request, make_response, Blueprint, flash
 
 from context import Session
 from models.users import User
@@ -56,22 +56,21 @@ def password_change():
             # TODO Show error wrong old password
             return render_template("auth/password_change_form.html")
 
-
 @auth.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'GET':
-        return render_template("auth/register.html")
+        return render_template("auth/signin.html")
     else:
         email = request.form['user']
         pwd = request.form['pass']
         s = Session()
-        if User.get_by_email(email) is not None:
-            # TODO Show error email already used
-            pass
-        new_user = User(email=email, name=email)
-        new_user.set_password(pwd)
-        s.add(new_user)
-        s.commit()
-        return redirect(url_for('home'))
+        if User.get_by_email(email) is None:
+            new_user = User(email=email, name=email)
+            new_user.set_password(pwd)
+            s.add(new_user)
+            s.commit()
+            return redirect(url_for('front.home'))
+        flash('email già esistente ! prova ad accedere')
+        return redirect(url_for('auth.sign_up'))
 
 

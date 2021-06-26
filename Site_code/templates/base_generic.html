@@ -26,7 +26,7 @@
     {% set login = url_for('auth.login') %}
     {% set logout = url_for('auth.logout') %}
     {% set password_change = url_for('auth.password_change') %}
-
+    {% set signin = url_for('auth.sign_up') %}
     {% set surveys_new = url_for('surveys.new') %}
 
 
@@ -51,8 +51,8 @@
                     <a class="nav-link" href="{{ surveys_new }}">Surveys</a>
                 </li>
 
-                <li class="nav-item {% if request.path == "" %} active {% endif %}">
-                    <a class="nav-link" href="">bbbbbb</a>
+                <li class="nav-item {% if request.path == signin %} active {% endif %}">
+                    <a class="nav-link" href="{{ signin }}">signin</a>
                 </li>
 
                 <li class="nav-item {% if request.path == "" %} active {% endif %}">
@@ -93,6 +93,17 @@
 <div class="container">
     {% block content %}<!-- content text -->{% endblock %}
 </div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <script>
+      var messages = {{ messages | safe }};
+      for (var i=0; i<messages.length; i++) {
+        alert(messages[i]);
+      }
+    </script>
+  {% endif %}
+{% endwith %}
 
 {% block footer %}
 {% endblock %}
