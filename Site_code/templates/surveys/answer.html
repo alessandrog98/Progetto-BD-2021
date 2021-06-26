@@ -1,0 +1,80 @@
+{% extends "base_generic.html" %}
+
+{% block head %}
+    {#    <script src="{{ static('js/surveys_new.js') }}"></script>#}
+{% endblock %}
+
+
+{% block content %}
+    <style>
+        .myLabel
+        {
+            width: 200px;
+            padding-right: 10px;
+            padding-left: 20px;
+            display: block!important;
+            text-align: right;
+        }
+    </style>
+
+    <h3>Survey Title</h3>
+    <h6 class="text-muted">This survey is Anonymous</h6>
+
+    <div id="itemsContainer" class="col-xl-10 ml-auto mr-auto">
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Titolo Domanda</h5>
+                <span class="text-danger">Mandatory Question</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <span class="">Description Domanda</span>
+                </div>
+                <div class="mb-2">
+                    <span class="">Description Regex</span>
+                </div>
+                <div class="form mt-2">
+                    <label class="font-weight-bold pr-3">Answer:</label>
+                    <input class="form-control item-answer" type="text">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Titolo Domanda</h5>
+                <span class="text-muted">From 0 to 5 answer</span><!-- TODO X answer if x/x-->
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <span class="">Description Domanda</span>
+                </div>
+                <div class="mb-2">
+                    <table class="table table-striped">
+                        <tbody>
+                        <tr>
+                            <td>Testo Risposta 1</td>
+                            <td><input type="checkbox"></td><!--TODO RadioButton if 0/1 or 1/1 -->
+                        </tr>
+                        <tr>
+                            <td>Testo Risposta 2</td>
+                            <td><input type="checkbox"></td>
+                        </tr>
+                        <tr>
+                            <td>Testo Risposta 3</td>
+                            <td><input type="checkbox"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+{% endblock %}

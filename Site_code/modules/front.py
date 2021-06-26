@@ -11,8 +11,8 @@ from models.users import User
 front = Blueprint('front', __name__)
 
 
-@login_required
 @front.route('/private')
+@login_required
 def private():
     users = current_user.get_id()
     resp = make_response(render_template("private.html", users=users))
