@@ -28,10 +28,11 @@
     {% set password_change = url_for('auth.password_change') %}
     {% set signin = url_for('auth.sign_up') %}
     {% set surveys_new = url_for('surveys.new') %}
+    {% set reservedarea = url_for('auth.reservedarea') %}
 
 
     <nav class="navbar fixed-top navbar-expand-xl navbar-dark bg-primary shadow">
-        <a class="navbar-brand" href="{{ home }}"><img src="" height="40px" alt="logo"/></a>
+        <a class="navbar-brand" href="{{ home }}"><i class="fas fa-poll" height="40px"></i></a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -40,7 +41,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li>
-                    <b class="navbar-brand">Name</b>
+                    <b class="navbar-brand">WS Surveys</b>
                 </li>
 
                 <li class="nav-item {% if request.path == home %} active {% endif %}">
@@ -55,8 +56,8 @@
                     <a class="nav-link" href="{{ signin }}">signin</a>
                 </li>
 
-                <li class="nav-item {% if request.path == "" %} active {% endif %}">
-                    <a class="nav-link" href="">cccccc</a>
+                <li class="nav-item {% if request.path == reservedarea %} active {% endif %}">
+                    <a class="nav-link" href="{{ reservedarea }}">reserved area</a>
                 </li>
 
                 {% if user.is_superuser %}

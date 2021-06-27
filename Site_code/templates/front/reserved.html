@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <br>
+    <h3>Benvenuto {{ user.get_full_name() }} nella tua area riservata</h3>
+        <ul>
+        <br>
+            <p> Ecco i tuoi quesitonari : </p>
+            {% for item in data %}
+            <li>{{item.id}}</li>
+        {% endfor %}
+        </ul>
+{% endblock %}

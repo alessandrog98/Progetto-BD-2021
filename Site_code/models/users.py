@@ -3,6 +3,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, F
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from context import SQLBase, login_manager, Session
+from models.survey import Survey
 
 
 class User(UserMixin, SQLBase):
@@ -37,3 +38,6 @@ class User(UserMixin, SQLBase):
     def load_user(id):
         return Session().query(User).filter_by(id=int(id)).first()
 
+    def my_surveys(id):
+        query = Session().query(Survey).filter_by(author_id=int(id)).all()
+        return query

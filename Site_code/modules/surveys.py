@@ -25,4 +25,3 @@ def answer():
 @surveys.route('/')
 def home():
     return render_template("front/home.html")
-
