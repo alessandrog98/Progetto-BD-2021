@@ -32,10 +32,10 @@ def home():
 # @login_required
 def get_survey(id):
     qry = Session().query(Survey).filter_by(id=id)
-    mys = None
+    mys= {}
     for row in qry :
-        mys = {id : (row.id ,row.permit_anon_answer ,row.title ,row.author_id)}
-    return mys
+        mys[row.id] = {"permit_anon_answer":row.permit_anon_answer ,"title:":row.title ,"autor_id":row.author_id}
+    return json.dumps(mys)
 
 @surveys.route('/survey', methods=['GET'])
 # @login_required
@@ -43,8 +43,8 @@ def get_survey_all():
     qry = Session().query(Survey)
     data = {}
     for row in qry:
-        data[row.id] = {(row.permit_anon_answer, row.title, row.author_id)}
-    return data
+        data[row.id] = {"permit_anon_answer":row.permit_anon_answer, "title":row.title, "author_id":row.author_id}
+    return json.dumps(data)
 
 
 @surveys.route('/survey', methods=['POST'])
@@ -52,7 +52,7 @@ def insert_survey():
     data = request.json
     survey = Survey(title=data['title'],
                     permit_anon_answer=data['permit_anon_answer'],
-                    author=User.get_by_email('admin'),
+                    author_id=User.get_by_email('admin').id,
                     questions=[])
     for question_row in data['questions']:
         question = Question(order=question_row['order'],
@@ -71,7 +71,7 @@ def insert_survey():
                 question.closed_question.closed_question_options.insert(option)
         else:
             pass  # TODO Exception
-        survey.questions.insert(question)
+    survey.questions.insert(question)
     session = Session()
     session.add(survey)
     session.commit()
