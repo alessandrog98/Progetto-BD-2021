@@ -1,11 +1,14 @@
-import flask
-import datetime
 
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, request, make_response, Blueprint
 from models.survey import Survey
 from context import Session
 from models.users import User
+from models.question import Question, QuestionTypes
+from models.question_open import OpenQuestion
+from models.question_closed import ClosedQuestion
+from models.question_closed_option import ClosedQuestionOption
+import json
 
 surveys = Blueprint('surveys', __name__)
 
@@ -25,25 +28,51 @@ def answer():
 def home():
     return render_template("front/home.html")
 
-@surveys.route('/get_survey/<id>', methods=['GET'])
-#@login_required
+@surveys.route('/survey/<id>', methods=['GET'])
+# @login_required
 def get_survey(id):
     qry = Session().query(Survey).filter_by(id=id)
     mys = None
     for row in qry :
-        mys = {id : (row.id,row.permit_anon_answer,row.title,row.author_id)}
+        mys = {id : (row.id ,row.permit_anon_answer ,row.title ,row.author_id)}
     return mys
 
-@surveys.route('/get_survey', methods=['GET'])
-#@login_required
+@surveys.route('/survey', methods=['GET'])
+# @login_required
 def get_survey_all():
     qry = Session().query(Survey)
-    mys = None
+    data = {}
     for row in qry:
-        mys += {id: (row.id, row.permit_anon_answer, row.title, row.author_id)}
-    return mys
+        data[row.id] = {(row.permit_anon_answer, row.title, row.author_id)}
+    return data
 
-@surveys.route('/insert_survey', methods=['POST'])
+
+@surveys.route('/survey', methods=['POST'])
 def insert_survey():
-    data = request.form
+    data = request.json
+    survey = Survey(title=data['title'],
+                    permit_anon_answer=data['permit_anon_answer'],
+                    author=User.get_by_email('admin'),
+                    questions=[])
+    for question_row in data['questions']:
+        question = Question(order=question_row['order'],
+                            title=question_row['title'],
+                            text=question_row['text'])
+        if question_row['type'] == QuestionTypes.OpenQuestion:
+            question.open_question = OpenQuestion(regex=question_row['regex'],
+                                                  regex_description=question_row['regex_description'],
+                                                  mandatory=question_row['mandatory'])
+        elif question_row['type'] == QuestionTypes.ClosedQuestion:
+            question.closed_question = ClosedQuestion(min_n_of_answer=question_row['min'],
+                                                      max_n_of_answer=question_row['max'])
+            for option_row in question_row['options']:
+                option = ClosedQuestionOption(order=question_row['order'],
+                                              text=question_row['text'])
+                question.closed_question.closed_question_options.insert(option)
+        else:
+            pass  # TODO Exception
+        survey.questions.insert(question)
+    session = Session()
+    session.add(survey)
+    session.commit()
     return data
