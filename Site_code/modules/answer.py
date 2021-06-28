@@ -1,6 +1,6 @@
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, request, make_response, Blueprint
-from models.survey import Survey
+from models.answer import Answer
 from context import Session
 from models.users import User
 from models.question import Question, QuestionTypes
@@ -15,18 +15,32 @@ answers = Blueprint('answer', __name__)
 @answers.route('/answers/<id>', methods=['GET'])
 # @login_required
 def get_answer(id):
-    qry = Session().query().filter_by(id=id)
-    mys = None
-    for row in qry :
-        mys = {id : (row.id ,row.permit_anon_answer ,row.title ,row.author_id)}
-    return mys
+    quest = Session().query(Question).filter_by(id=id)
+    data = {}
+    if quest.get_type == QuestionTypes.OpenQuestion:
+        quest = Session().query(OpenQuestion).filter_by(id=id)
+        for ans in quest.open_answer:
+            data[quest.id] = {ans.text}
+        return data
+    elif quest.get_type == QuestionTypes.ClosedQuestion:
+        quest = Session().query(ClosedQuestionOption).filter_by(closed_question_id = id)
+        all_q = []
+        for q in quest :
+            all_q.append(q)
+        for ans in all_q:
+            for an in ans.closed_answers:
+                data[ans.id] = {an.answer_id}
+        return data
+    else:
+        pass
 
 
-@answers.route('/survey', methods=['GET'])
+
+@answers.route('/answers', methods=['GET'])
 # @login_required
-def get_survey_all():
-    qry = Session().query(Survey)
+def get_answers_all():
+    qry = Session().query(Answer)
     data = {}
     for row in qry:
-        data[row.id] = {(row.permit_anon_answer, row.title, row.author_id)}
+        data[row.id] = {row.permit_anon_answer, row.title, row.author_id}
     return data
