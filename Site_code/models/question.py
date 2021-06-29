@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, Text, CheckConstraint
 from sqlalchemy.orm import relationship
 
 from context import SQLBase, Session

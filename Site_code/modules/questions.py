@@ -10,10 +10,9 @@ from models.question_closed_option import ClosedQuestionOption
 import json
 
 
-answers = Blueprint('answer', __name__)
+questions = Blueprint('questions', __name__)
 
-
-@answers.route('/answers/<id>', methods=['GET'])
+@questions.route('/questions/<id>', methods=['GET'])
 # @login_required
 def get_answer(id):
     quest = Session().query(Question).filter_by(id=id)
@@ -35,7 +34,9 @@ def get_answer(id):
     else:
         pass
 
-@answers.route('/answers_all/<id>', methods=['GET'])
+
+
+@questions.route('/questions/<id>', methods=['GET'])
 # @login_required
 def get_answers_all(id):
     quest = Session().query(Question).filter_by(survey_id=id)
@@ -43,3 +44,4 @@ def get_answers_all(id):
     for ans in quest:
         get_answer(ans.id)
     return
+

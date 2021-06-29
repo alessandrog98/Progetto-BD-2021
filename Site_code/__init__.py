@@ -17,6 +17,7 @@ def register_blueprints(app):
     from modules.front import front
     from modules.login import auth
     from modules.surveys import surveys
+    from modules.surveys import surveys
     app.register_blueprint(front, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/account')
     app.register_blueprint(surveys, url_prefix='/surveys')
