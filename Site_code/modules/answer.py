@@ -12,6 +12,7 @@ import json
 
 answers = Blueprint('answer', __name__)
 
+
 @answers.route('/answers/<id>', methods=['GET'])
 # @login_required
 def get_answer(id):
@@ -21,26 +22,24 @@ def get_answer(id):
         quest = Session().query(OpenQuestion).filter_by(id=id)
         for ans in quest.open_answer:
             data[quest.id] = {ans.text}
-        return data
+        return json.dumps(data)
     elif quest.get_type == QuestionTypes.ClosedQuestion:
-        quest = Session().query(ClosedQuestionOption).filter_by(closed_question_id = id)
+        quest = Session().query(ClosedQuestionOption).filter_by(closed_question_id=id)
         all_q = []
         for q in quest :
             all_q.append(q)
         for ans in all_q:
             for an in ans.closed_answers:
                 data[ans.id] = {an.answer_id}
-        return data
+        return json.dumps(data)
     else:
         pass
 
-
-
-@answers.route('/answers', methods=['GET'])
+@answers.route('/answers_all/<id>', methods=['GET'])
 # @login_required
-def get_answers_all():
-    qry = Session().query(Answer)
+def get_answers_all(id):
+    quest = Session().query(Question).filter_by(survey_id=id)
     data = {}
-    for row in qry:
-        data[row.id] = {row.permit_anon_answer, row.title, row.author_id}
-    return data
+    for ans in quest:
+        get_answer(ans.id)
+    return
