@@ -389,7 +389,7 @@ $(function () {
 
         $.post(
         {
-            url : '/surveys/survey',
+            url : '/survey/',
 
             data: JSON.stringify(data),
             dataType : 'json',

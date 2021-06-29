@@ -10,44 +10,40 @@ from models.question_closed import ClosedQuestion
 from models.question_closed_option import ClosedQuestionOption
 import json
 
-surveys = Blueprint('surveys', __name__)
+survey = Blueprint('survey', __name__)
 
 
-@surveys.route('/new', methods=['GET', 'POST'])
+@survey.route('/new/', methods=['GET'])
 @login_required
 def new():
     return render_template("surveys/new.html")
 
 
-@surveys.route('/id/answer', methods=['GET', 'POST'])
-# @login_required
-def answer():
-    return render_template("surveys/answer.html")
+@survey.route('/<id>/answer/', methods=['GET', 'POST'])
+@login_required
+def answer(id):
+    s = Session().query(Survey).filter_by(id=id).first()
+    return render_template("surveys/answer.html", survey=s, QuestionTypes=QuestionTypes)
 
-@surveys.route('/')
-def home():
-    return render_template("front/home.html")
 
-@surveys.route('/survey/<id>', methods=['GET'])
+@survey.route('/<id>/', methods=['GET'])
 # @login_required
 def get_survey(id):
-    qry = Session().query(Survey).filter_by(id=id)
-    mys= {}
-    for row in qry :
-        mys[row.id] = {"permit_anon_answer":row.permit_anon_answer ,"title:":row.title ,"autor_id":row.author_id}
-    return json.dumps(mys)
+    row = Session().query(Survey).filter_by(id=id).first()
+    return json.dumps({"permit_anon_answer": row.permit_anon_answer, "title:": row.title, "author_id": row.author_id})
 
-@surveys.route('/survey', methods=['GET'])
+
+@survey.route('/', methods=['GET'])
 # @login_required
 def get_survey_all():
     qry = Session().query(Survey)
     data = {}
     for row in qry:
-        data[row.id] = {"permit_anon_answer":row.permit_anon_answer, "title":row.title, "author_id":row.author_id}
+        data[row.id] = {"permit_anon_answer": row.permit_anon_answer, "title": row.title, "author_id": row.author_id}
     return json.dumps(data)
 
 
-@surveys.route('/survey', methods=['POST'])
+@survey.route('/', methods=['POST'])
 def insert_survey():
     data = request.json
     survey = Survey(title=data['title'],
@@ -58,21 +54,21 @@ def insert_survey():
         question = Question(order=question_row['order'],
                             title=question_row['title'],
                             text=question_row['text'])
-        if question_row['type'] == QuestionTypes.OpenQuestion:
+        if question_row['type'] == str(QuestionTypes.OpenQuestion.value):
             question.open_question = OpenQuestion(regex=question_row['regex'],
                                                   regex_description=question_row['regex_description'],
                                                   mandatory=question_row['mandatory'])
-        elif question_row['type'] == QuestionTypes.ClosedQuestion:
+        elif question_row['type'] == str(QuestionTypes.ClosedQuestion.value):
             question.closed_question = ClosedQuestion(min_n_of_answer=question_row['min'],
                                                       max_n_of_answer=question_row['max'])
             for option_row in question_row['options']:
-                option = ClosedQuestionOption(order=question_row['order'],
-                                              text=question_row['text'])
-                question.closed_question.closed_question_options.insert(option)
+                question.closed_question.closed_question_options.append(
+                    ClosedQuestionOption(order=option_row['order'], text=option_row['text'])
+                )
         else:
             pass  # TODO Exception
+        survey.questions.append(question)
 
-        survey.questions.insert(question)
     session = Session()
     session.add(survey)
     session.commit()

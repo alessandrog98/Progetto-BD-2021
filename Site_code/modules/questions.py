@@ -12,6 +12,7 @@ import json
 
 questions = Blueprint('questions', __name__)
 
+
 @questions.route('/questions/<id>', methods=['GET'])
 # @login_required
 def get_answer(id):
@@ -25,7 +26,7 @@ def get_answer(id):
     elif quest.get_type == QuestionTypes.ClosedQuestion:
         quest = Session().query(ClosedQuestionOption).filter_by(closed_question_id=id)
         all_q = []
-        for q in quest :
+        for q in quest:
             all_q.append(q)
         for ans in all_q:
             for an in ans.closed_answers:
@@ -33,7 +34,6 @@ def get_answer(id):
         return json.dumps(data)
     else:
         pass
-
 
 
 @questions.route('/questions/<id>', methods=['GET'])

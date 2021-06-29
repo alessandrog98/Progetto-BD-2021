@@ -16,11 +16,10 @@ from config import config_dict
 def register_blueprints(app):
     from modules.front import front
     from modules.login import auth
-    from modules.surveys import surveys
-    from modules.surveys import surveys
+    from modules.survey import survey
     app.register_blueprint(front, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/account')
-    app.register_blueprint(surveys, url_prefix='/surveys')
+    app.register_blueprint(survey, url_prefix='/survey')
 
 
 def create_app():
