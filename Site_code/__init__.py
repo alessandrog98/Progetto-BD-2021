@@ -17,10 +17,11 @@ def register_blueprints(app):
     from modules.front import front
     from modules.login import auth
     from modules.survey import survey
+    from modules.answer import answers
     app.register_blueprint(front, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/account')
     app.register_blueprint(survey, url_prefix='/survey')
-
+    app.register_blueprint(answers, url_prefix='/answer')
 
 def create_app():
     DEV = config('Dev', default=True)
