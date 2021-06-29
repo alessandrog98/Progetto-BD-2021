@@ -23,7 +23,16 @@ def new():
 @login_required
 def answer(id):
     s = Session().query(Survey).filter_by(id=id).first()
-    return render_template("surveys/answer.html", survey=s, QuestionTypes=QuestionTypes)
+    qs = sorted(s.questions, key=lambda x: x.order)
+    for q in qs:
+        if q.get_type() == QuestionTypes.OpenQuestion:
+            q.open = q.open_question
+        elif q.get_type() == QuestionTypes.ClosedQuestion:
+            q.closed = q.closed_question
+            q.closed.options = sorted(q.closed.closed_question_options, key=lambda x: x.order)
+        else:
+            pass  # TODO exception
+    return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
 
 
 @survey.route('/<id>/', methods=['GET'])

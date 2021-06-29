@@ -17,58 +17,70 @@
         }
     </style>
 
-    <h3>Survey Title</h3>
-    <h6 class="text-muted">This survey is Anonymous</h6>
+    <h3>{{ survey.title }}</h3>
+    {% if survey.permit_anon_answer %}
+        <h6 class="text-muted">This answer is Anonymous</h6>
+    {% else %}
+        <h6 class="text-muted">This answer will be posted under the name ...</h6>
+    {% endif %}
 
     <div id="itemsContainer" class="col-xl-10 ml-auto mr-auto">
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">Titolo Domanda</h5>
-                <span class="text-danger">Mandatory Question</span>
-            </div>
-            <div class="card-body">
-                <div class="mb-2">
-                    <span class="">Description Domanda</span>
+        {% for q in questions %}
+            {% if q.get_type() == QuestionTypes.OpenQuestion %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ q.title }}</h5>
+                        {% if q.open.mandatory %}
+                            <span class="text-danger">Mandatory Question</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="">{{ q.text }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="">{{ q.open.regex_description }}</span>
+                        </div>
+                        <div class="form mt-2">
+                            <label class="font-weight-bold pr-3">Answer:</label>
+                            <input class="form-control item-answer" type="text">
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-2">
-                    <span class="">Description Regex</span>
+            {% elif q.get_type() == QuestionTypes.ClosedQuestion %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ q.title }}</h5>
+                        {% if q.closed.min_n_of_answer == q.closed.max_n_of_answer %}
+                            <span class="text-muted">Select {{ q.closed.max_n_of_answer }} answer</span>
+                        {% else %}
+                            <span class="text-muted">From {{ q.closed.min_n_of_answer }} to {{ q.closed.max_n_of_answer }} answer</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="">{{ q.text }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <table class="table table-striped">
+                                <tbody>
+                                {% for o in q.closed.options %}
+                                    <tr>
+                                        <td>{{ o.text }}</td>
+                                        {% if q.closed.min_n_of_answer == 1 and q.closed.max_n_of_answer == 1 %}
+                                            <td><input type="radio" name="{{ q.id }}"></td>
+                                        {% else %}
+                                            <td><input type="checkbox"></td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="form mt-2">
-                    <label class="font-weight-bold pr-3">Answer:</label>
-                    <input class="form-control item-answer" type="text">
-                </div>
-            </div>
-        </div>
-
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">Titolo Domanda</h5>
-                <span class="text-muted">From 0 to 5 answer</span><!-- TODO X answer if x/x-->
-            </div>
-            <div class="card-body">
-                <div class="mb-2">
-                    <span class="">Description Domanda</span>
-                </div>
-                <div class="mb-2">
-                    <table class="table table-striped">
-                        <tbody>
-                        <tr>
-                            <td>Testo Risposta 1</td>
-                            <td><input type="checkbox"></td><!--TODO RadioButton if 0/1 or 1/1 -->
-                        </tr>
-                        <tr>
-                            <td>Testo Risposta 2</td>
-                            <td><input type="checkbox"></td>
-                        </tr>
-                        <tr>
-                            <td>Testo Risposta 3</td>
-                            <td><input type="checkbox"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+            {% endif %}
+        {% endfor %}
     </div>
 
     <script>
