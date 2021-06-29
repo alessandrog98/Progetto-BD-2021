@@ -1,4 +1,4 @@
-
+import flask
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, request, make_response, Blueprint
 from models.survey import Survey
@@ -71,8 +71,9 @@ def insert_survey():
                 question.closed_question.closed_question_options.insert(option)
         else:
             pass  # TODO Exception
-    survey.questions.insert(question)
+
+        survey.questions.insert(question)
     session = Session()
     session.add(survey)
     session.commit()
-    return data
+    return flask.Response(status=200)

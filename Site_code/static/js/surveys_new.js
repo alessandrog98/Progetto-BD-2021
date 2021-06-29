@@ -103,7 +103,6 @@ class SurveysItem {
         this.$btn_up = this.$container.find('.item-cmd-up');
         this.$btn_down = this.$container.find('.item-cmd-down');
         this.$chk_mandatory = this.$container.find('.item-mandatory');
-        // this.$chk_mandatory.bootstrapToggle();
     }
 
     setEvents() {
@@ -284,6 +283,41 @@ class SurveysItem {
             that.insertAtIndex(newIndex);
         };
     }
+
+    getInfo(order)
+    {
+        let out = {};
+        out.order = order;
+        out.title = this.$container.find('input[name="title"]').val();
+        out.text = this.$container.find('.item-description').val();
+        out.type = this.$select_type.val();
+        if(out.type === "1") //Open-ended Question
+        {
+            let $regexSelector = this.$container.find(".item-openType :selected");
+
+            out.mandatory = this.$chk_mandatory.is(":checked");
+            out.regex = $regexSelector.val();
+            out.regex_description = $regexSelector.text();
+
+            if(out.regex === "custom")
+            {
+                out.regex = this.$container.find(".item-customRegex").val();
+                out.regex_description = this.$container.find(".item-customRegexDescription").val();
+            }
+        }
+        else if (out.type === "2") //Closed-ended Question
+        {
+            out.min = this.$container.find('.item-minChoice').val();
+            out.max = this.$container.find('.item-maxChoice').val();
+            out.options = [];
+            let options = this.$container.find(".item-option");
+            for(let i = 0; i < options.length; ++i)
+            {
+                out.options.push({'order': i, 'text': options.eq(i).val()});
+            }
+        }
+        return out;
+    }
 }
 
 class AddButton {
@@ -340,4 +374,31 @@ let items = [];
 let topAddButton = new AddButton(null);
 $(function () {
     $('#itemsContainer').append(topAddButton.$container);
+
+    let $save = $('#save');
+    $save.click(function ()
+    {
+        $save.addClass('disabled');
+        let data = {};
+        data.title = $('#title').val();
+        data.permit_anon_answer = $('#permit_anon_true').is(':checked');
+
+        data.questions = [];
+        for(let i = 0; i < items.length; ++i)
+            data.questions.push(items[i].getInfo(i));
+
+        $.post(
+        {
+            url : '/surveys/survey',
+
+            data: JSON.stringify(data),
+            dataType : 'json',
+            contentType: "application/json"
+        })
+        .done(function (response)
+        {
+
+        })
+        // .fail()
+    });
 });
