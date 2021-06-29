@@ -14,5 +14,4 @@ class ClosedQuestion(SQLBase):
     max_n_of_answer = Column(Integer)
 
     closed_question_options = relationship("ClosedQuestionOption", back_populates="closed_question")
-
-
+    CheckConstraint('(SELECT COUNT(closed_question_options))>=min_n_of_answer OR (SELECT COUNT(closed_question_options))<=max_n_of_answer', name='check_option')
