@@ -12,6 +12,7 @@ import json
 
 answers = Blueprint('answer', __name__)
 
+
 @answers.route('/answers/<id>', methods=['GET'])
 # @login_required
 def get_answer(id):
@@ -34,8 +35,6 @@ def get_answer(id):
     else:
         pass
 
-
-
 @answers.route('/answers_all/<id>', methods=['GET'])
 # @login_required
 def get_answers_all(id):
@@ -44,5 +43,3 @@ def get_answers_all(id):
     for ans in quest:
         get_answer(ans.id)
     return
-
-

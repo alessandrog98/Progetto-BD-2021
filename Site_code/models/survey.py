@@ -16,4 +16,4 @@ class Survey(SQLBase):
 
     questions = relationship("Question", back_populates="survey")
     answers = relationship("Answer", back_populates="survey")
-    CheckConstraint('(SELECT COUNT(quesitons))>=(SELECT COUNT(answers))',name='check_option')
+    CheckConstraint('(SELECT COUNT(quesitons))>=(SELECT COUNT(answers))', name='check_option')
