@@ -17,30 +17,50 @@ class ClosedAnswer(SQLBase):
 
 
 maxAns = DDL(
-    'CREATE OR REPLACE FUNCTION max_Ans() '
-    'RETURNS TRIGGER as $$'
-    'DECLARE numAns integer := (SELECT COUNT(*) FROM new.answers_closed);'
-    'DECLARE idQ integer := (SELECT closed_question_option_id FROM new.answers_closed LIMIT 1);'
-    'BEGIN'
-    '   IF (numAns<=(SELECT q.max_n_of_answer '
-    '                FROM questions_closed AS q JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id'
-    '                WHERE qc.id = idQ LIMIT 1)'
-    '       OR numAns>=(SELECT q.min_n_of_answer'
-    '                   FROM questions_closed AS q JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id'
-    '                   WHERE qc.id = idQ LIMIT 1)) THEN'
-    '           RETURN NULL;'
-    '   END IF;'
-    '   RETURN NEW;'
-    'END;'
-    '$$ LANGUAGE plpgsql'
+    """CREATE OR REPLACE FUNCTION max_Ans() 
+    RETURNS TRIGGER as $$
+    DECLARE my_cursor refcursor;
+    DECLARE idQ integer;
+    DECLARE idA integer;
+    DECLARE numAns integer;
+    DECLARE diffNumAns integer;
+    BEGIN
+       OPEN my_cursor FOR  (SELECT DISTINCT qco.closed_question_id, n.answer_id
+                            FROM new AS n
+                            INNER JOIN questions_closed_options AS qco ON qco.id = n.closed_question_option_id);
+       FETCH NEXT FROM my_cursor INTO idQ, idA;
+       WHILE FOUND LOOP
+            numAns = (SELECT COUNT(*) FROM answers_closed WHERE closed_question_option_id = idQ AND answer_id = idA);
+            diffNumAns = (SELECT COUNT(*) FROM new WHERE closed_question_option_id = idQ AND answer_id = idA);
+            IF TG_OP = 'DELETE' THEN
+                diffNumAns = -diffNumAns;
+            END IF;
+            
+            IF ((numAns+diffNumAns) > (SELECT q.max_n_of_answer 
+                        FROM questions_closed AS q 
+                        INNER JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id
+                        WHERE qc.id = idQ)
+               OR numAns<(SELECT q.min_n_of_answer
+                           FROM questions_closed AS q
+                           INNER JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id
+                           WHERE qc.id = idQ)) THEN
+                   CLOSE my_cursor;
+                   RETURN NULL;
+            END IF;
+            FETCH NEXT FROM my_cursor INTO idQ, idA;
+       END LOOP;
+       CLOSE my_cursor;
+       RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql"""
 )
 
 trigger_maxAns = DDL(
-    'DROP TRIGGER IF EXISTS MaxClosedAns ON answers_closed;'
-    'CREATE TRIGGER MaxClosedAns'
-    'BEFORE INSERT OR UPDATE ON answers_closed '
-    'FOR EACH STATEMENT '
-    'EXECUTE PROCEDURE max_Ans();'
+    """DROP TRIGGER IF EXISTS MaxClosedAns ON answers_closed;
+    CREATE TRIGGER MaxClosedAns
+    BEFORE INSERT OR DELETE ON answers_closed 
+    FOR EACH STATEMENT 
+    EXECUTE PROCEDURE max_Ans();"""
 )
 
 event.listen(ClosedAnswer, 'before_insert', trigger_maxAns)

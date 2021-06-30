@@ -4,7 +4,7 @@ $(document).ready(function(){
     $(".table").on('click', 'tr', function (e) {
         e.preventDefault();
         var id = $(this).attr('value');
-        document.location.href = '/survey/' + id
+        window.location.href = 'http://127.0.0.1:5000/survey/'+id+'/summary_questions/'
     })
 })
 

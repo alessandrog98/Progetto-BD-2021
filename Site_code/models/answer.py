@@ -5,9 +5,11 @@ from sqlalchemy.orm import relationship
 
 from context import SQLBase, Session
 
+
 class AnswerTypes(Enum):
     OpenAnswer = 1
     ClosedAnswer = 2
+
 
 class Answer(SQLBase):
     __tablename__ = 'answers'
@@ -31,32 +33,34 @@ class Answer(SQLBase):
         else:
             return None  # TODO ExceptionAns
 
+
 SameSurvey = DDL(
-    'CREATE OR REPLACE FUNCTION same_survey()'
-    'RETURNS TRIGGER as $same_S$'
-    'BEGIN'
-    '   IF (new.id IN (SELECT answer_id FROM answers_closed;)) THEN'
-    '       IF (new.survey_id = (SELECT DISTINCT(q.survey_id)'
-    '                            FROM questions AS q JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id '
-    '                                 JOIN answers_closed AS a ON a.closed_question_option_id=qc.id'
-    '                            WHERE a.id = new.id;)) THEN'
-    '           RETURN NEW;'
-    '   ELSE IF (new.id IN (SELECT answer_id FROM answers_open;)) THEN'
-    '       IF (new.survey_id = (SELECT DISTINCT(q.survey_id)'
-    '                            FROM questions AS q JOIN answers_open AS a ON q.id = a.open_question_id'
-    '                            WHERE a.id = new.id;) THEN'
-    '           RETURN NEW;'
-    '   END IF;'
-    '   RETURN NULL;'
-    'END'
-    '$same_S$ LANGUAGE plpgsql')
+    """CREATE OR REPLACE FUNCTION same_survey()
+    RETURNS TRIGGER as $$
+    BEGIN
+       IF (new.id IN (SELECT answer_id FROM answers_closed)) THEN
+           IF (new.survey_id = (SELECT q.survey_id
+                                FROM answers_closed AS ac
+                                INNER JOIN question_closed_option AS qco ON ac.closed_question_option_id = qco.id
+                                INNER JOIN question AS q ON q.id = qco.closed_question_id
+                                WHERE ac.id = new.id)) THEN
+               RETURN NEW;
+       ELSE IF (new.id IN (SELECT answer_id FROM answers_open)) THEN
+           IF (new.survey_id = (SELECT q.survey_id
+                                FROM answer_open AS ao
+                                INNER JOIN question AS q ON ao.open_question_id = q.id
+                                WHERE ao.id = new.id)) THEN
+               RETURN NEW;
+       END IF;
+       RETURN NULL;
+    END;
+    $$ LANGUAGE plpgsql""")
 
 trigger_SameSurvey = DDL(
-    'DROP TRIGGER IF EXISTS TrigSameSurvey ON answers;'
-    'CREATE TRIGGER TrigSameSurvey'
-    'BEFORE INSERT ON answers'
-    'FOR EACH STATEMENT '
-    'EXECUTE PROCEDURE same_survey();'
-        )
+    """DROP TRIGGER IF EXISTS TrigSameSurvey ON answers;
+    CREATE TRIGGER TrigSameSurvey
+    BEFORE INSERT OR UPDATE ON answers
+    FOR EACH ROW
+    EXECUTE PROCEDURE same_survey()""")
 
 event.listen(Answer, 'before_insert', trigger_SameSurvey)

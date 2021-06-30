@@ -41,10 +41,6 @@
                         <div class="mb-2">
                             <span class="">{{ q.open.regex_description }}</span>
                         </div>
-                        <div class="form mt-2">
-                            <label class="font-weight-bold pr-3">Answer:</label>
-                            <input id="{{ q.id }}" class="form-control item-answer" type="text">
-                        </div>
                     </div>
                 </div>
             {% elif q.get_type() == QuestionTypes.ClosedQuestion %}
@@ -67,11 +63,7 @@
                                 {% for o in q.closed.options %}
                                     <tr>
                                         <td>{{ o.text }}</td>
-                                        {% if q.closed.min_n_of_answer == 1 and q.closed.max_n_of_answer == 1 %}
-                                            <td><input id="{{ o.id }}" type="radio" name="{{ q.id }}"></td>
-                                        {% else %}
-                                            <td><input type="checkbox"></td>
-                                        {% endif %}
+                                        <td class="text-right">percentuale</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>

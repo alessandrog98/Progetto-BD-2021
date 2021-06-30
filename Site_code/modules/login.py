@@ -56,10 +56,11 @@ def password_change():
             # TODO Show error wrong old password
             return render_template("auth/password_change_form.html")
 
+
 @auth.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'GET':
-        return render_template("auth/signin.html")
+        return render_template("auth/sign.html")
     else:
         email = request.form['user']
         pwd = request.form['pass']
@@ -73,10 +74,10 @@ def sign_up():
         flash('email già esistente ! prova ad accedere')
         return redirect(url_for('auth.sign_up'))
 
+
 @auth.route('/reservedarea')
 @login_required
 def reservedarea():
-    usr = User.get_id(current_user)
-    data = User.my_surveys(usr)
-    return render_template("front/reserved.html", data = data)
+    data = User.my_surveys(current_user.get_id())
+    return render_template("front/reserved.html", data=data)
 

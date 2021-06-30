@@ -58,7 +58,7 @@ def insert_survey():
     data = request.json
     survey = Survey(title=data['title'],
                     permit_anon_answer=data['permit_anon_answer'],
-                    author_id=User.get_by_email('admin').id,
+                    author_id=current_user.get_id(),
                     questions=[])
     for question_row in data['questions']:
         question = Question(order=question_row['order'],
@@ -85,7 +85,7 @@ def insert_survey():
     return flask.Response(status=200)
 
 
-@survey.route('/<id>', methods=['DELETE'])
+@survey.route('/<id>/', methods=['DELETE'])
 # @login_required
 def delete_survey(id):
     session = Session()
@@ -99,3 +99,17 @@ def delete_survey(id):
     return
 
 
+@survey.route('<id>/summary_questions/', methods=['GET', 'POST'])
+@login_required
+def summary_questions(id):
+    s = Session().query(Survey).filter_by(id=id).first()
+    qs = sorted(s.questions, key=lambda x: x.order)
+    for q in qs:
+        if q.get_type() == QuestionTypes.OpenQuestion:
+            q.open = q.open_question
+        elif q.get_type() == QuestionTypes.ClosedQuestion:
+            q.closed = q.closed_question
+            q.closed.options = sorted(q.closed.closed_question_options, key=lambda x: x.order)
+        else:
+            pass  # TODO exception
+    return render_template("surveys/summary_survey.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)

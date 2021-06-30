@@ -10,23 +10,23 @@ from models.survey import Survey
 from models.question_closed_option import ClosedQuestionOption
 import json
 
-answers = Blueprint('answer', __name__)
+answer = Blueprint('answer', __name__)
 
 
-@answers.route('/answers/<id>', methods=['GET'])
+@answer.route('/<id>/', methods=['GET'])
 # @login_required
 def get_answer(id):
-    quest = Session().query(Question).filter_by(id=id)
+    quest = Session().query(Question).filter_by(id=id).first()
     data = {}
     if quest.get_type == QuestionTypes.OpenQuestion:
-        quest = Session().query(OpenQuestion).filter_by(id=id)
+        quest = Session().query(OpenQuestion).filter_by(id=id).first()
         for ans in quest.open_answer:
             data[quest.id] = {ans.text}
         return json.dumps(data)
     elif quest.get_type == QuestionTypes.ClosedQuestion:
         quest = Session().query(ClosedQuestionOption).filter_by(closed_question_id=id)
         all_q = []
-        for q in quest :
+        for q in quest:
             all_q.append(q)
         for ans in all_q:
             for an in ans.closed_answers:
@@ -35,7 +35,8 @@ def get_answer(id):
     else:
         pass
 
-@answers.route('/answers_all/<id>', methods=['GET'])
+
+@answer.route('/answers_all/<id>/', methods=['GET'])
 # @login_required
 def get_answers_all(id):
     quest = Session().query(Question).filter_by(survey_id=id)
@@ -44,23 +45,27 @@ def get_answers_all(id):
         get_answer(ans.id)
     return
 
-@answers.route('/answers/<id>', methods=['POST'])
-# @login_required
-def insert_answer(id):
-    data = request.json
-    survey = Session().query(Survey).get(id)
 
+@answer.route('/', methods=['POST'])
+# @login_required
+def insert_answer():
+    data = request.json
+    session = Session()
+    survey = session.query(Survey).get(data['survey_id'])
     for answer_row in data['answers']:
-        answer = Answer(user_id=current_user.get_id(),
-                        survey_id=id)
+        answer = Answer(user_id=current_user.get_id())
         if answer_row['type'] == str(AnswerTypes.OpenAnswer.value):
             answer.open_answers.append(OpenAnswer(text=answer_row['text']))
         elif answer_row['type'] == str(AnswerTypes.ClosedAnswer.value):
-            answer.closed_answers.append(ClosedAnswer(closed_question_option_id = answer_row['closed_question_option_id']))
+            answer.closed_answers.append(ClosedAnswer(closed_question_option_id=answer_row['closed_question_option_id']))
         else:
             pass  # TODO Exception
-    survey.answers.append(answer)
-    session = Session()
+        survey.answer.append(answer)
     session.commit()
     return data
 
+
+# @answer.route('/', methods=['GET'])
+# @login_required
+# def answer():
+#     return render_template("surveys/answer.html")
