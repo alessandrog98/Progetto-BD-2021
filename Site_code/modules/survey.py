@@ -82,3 +82,14 @@ def insert_survey():
     session.add(survey)
     session.commit()
     return flask.Response(status=200)
+
+
+@survey.route('/delete/<id>', methods=['DELETE'])
+def delete_survey(id):
+    session = Session()
+    session.query(Survey).filter_by(id = id).delete()
+    session.commit()
+    flash('Survey eliminato correttamente!')
+    return
+
+
