@@ -1,6 +1,6 @@
 import flask
 from flask_login import current_user, login_required
-from flask import render_template, redirect, url_for, request, make_response, Blueprint
+from flask import render_template, redirect, url_for, request, make_response, Blueprint, flash
 from models.survey import Survey
 from context import Session
 from models.users import User
@@ -53,6 +53,7 @@ def get_survey_all():
 
 
 @survey.route('/', methods=['POST'])
+# @login_required
 def insert_survey():
     data = request.json
     survey = Survey(title=data['title'],
@@ -84,12 +85,17 @@ def insert_survey():
     return flask.Response(status=200)
 
 
-@survey.route('/delete/<id>', methods=['DELETE'])
+@survey.route('/<id>', methods=['DELETE'])
+# @login_required
 def delete_survey(id):
     session = Session()
-    session.query(Survey).filter_by(id = id).delete()
-    session.commit()
-    flash('Survey eliminato correttamente!')
+    survey = session.query(Survey).get(id)
+    if (current_user.get_id() == survey.author_id):
+            session.query(Survey).filter_by(id = id).delete()
+            session.commit()
+            flash('Survey eliminato correttamente!')
+            return
+    flash('Non sei il propietario del survey!')
     return
 
 

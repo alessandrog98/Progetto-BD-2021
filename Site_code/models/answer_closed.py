@@ -17,28 +17,30 @@ class ClosedAnswer(SQLBase):
 
 
 maxAns = DDL(
-    "CREATE OR REPLACE FUNCTION max_Ans() "
-    "RETURNS TRIGGER as $$"
-    "DECLARE numAns integer := (SELECT COUNT(*) FROM new.answer_closed);"
-    "DECLARE idA integer := (SELECT DISTINCT(closed_question_option_id) FROM new.answer_closed);"
-    "BEGIN"
-         "IF (numAns <=  (SELECT q.max_n_of_answer FROM answers_closed AS a JOIN questions_closed AS q ON a.closed_question_option_id = q.id"
-                    "WHERE q.id = idA;) "
-             "OR numAns >= (SELECT min_n_of_answer FROM answers_closed AS a JOIN questions_closed AS q ON a.closed_question_option_id = q.id"
-                    "WHERE q.id = idA;) THEN"
-                "RETURN NULL;"
-        "END IF;"
-        "RETURN NEW;"
-    "END;"
-    "$$ LANGUAGE plpgsql"
+    'CREATE OR REPLACE FUNCTION max_Ans() '
+    'RETURNS TRIGGER as $$'
+    'DECLARE numAns integer := (SELECT COUNT(*) FROM new.answers_closed);'
+    'DECLARE idQ integer := (SELECT closed_question_option_id FROM new.answers_closed LIMIT 1);'
+    'BEGIN'
+    '   IF (numAns<=(SELECT q.max_n_of_answer '
+    '                FROM questions_closed AS q JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id'
+    '                WHERE qc.id = idQ LIMIT 1)'
+    '       OR numAns>=(SELECT q.min_n_of_answer'
+    '                   FROM questions_closed AS q JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id'
+    '                   WHERE qc.id = idQ LIMIT 1)) THEN'
+    '           RETURN NULL;'
+    '   END IF;'
+    '   RETURN NEW;'
+    'END;'
+    '$$ LANGUAGE plpgsql'
 )
 
 trigger_maxAns = DDL(
-    "DROP TRIGGER IF EXISTS MaxClosedAns ON answers_closed;"
-    "CREATE TRIGGER MaxClosedAns"
-    "BEFORE INSERT OR UPDATE ON answers_closed "
-    "FOR EACH STATEMENT "
-    "EXECUTE PROCEDURE max_Ans();"
+    'DROP TRIGGER IF EXISTS MaxClosedAns ON answers_closed;'
+    'CREATE TRIGGER MaxClosedAns'
+    'BEFORE INSERT OR UPDATE ON answers_closed '
+    'FOR EACH STATEMENT '
+    'EXECUTE PROCEDURE max_Ans();'
 )
 
 event.listen(ClosedAnswer, 'before_insert', trigger_maxAns)
