@@ -26,7 +26,7 @@
     {% if survey.permit_anon_answer %}
         <h6 class="text-muted">This answer is Anonymous</h6>
     {% else %}
-        <h6 class="text-muted">This answer will be posted under the name ...</h6>
+        <h6 class="text-muted">This answer will be posted under the name {{ user.get_full_name() }}</h6>
     {% endif %}
 
     <div id="itemsContainer" class="col-xl-10 ml-auto mr-auto">
