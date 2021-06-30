@@ -390,7 +390,6 @@ $(function () {
         $.post(
         {
             url : '/survey/',
-
             data: JSON.stringify(data),
             dataType : 'json',
             contentType: "application/json"
@@ -399,6 +398,9 @@ $(function () {
         {
 
         })
-        // .fail()
+        .fail(function ()
+        {
+            notifyDanger("Errore durante l'inserimento");
+        })
     });
 });

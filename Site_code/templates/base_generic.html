@@ -26,7 +26,7 @@
     {% set login = url_for('auth.login') %}
     {% set logout = url_for('auth.logout') %}
     {% set password_change = url_for('auth.password_change') %}
-    {% set signin = url_for('auth.sign_up') %}
+    {% set signup = url_for('auth.sign_up') %}
     {% set survey_new = url_for('survey.new') %}
     {% set reservedarea = url_for('auth.reservedarea') %}
 
@@ -52,8 +52,8 @@
                     <a class="nav-link" href="{{ survey_new }}">Surveys</a>
                 </li>
 
-                <li class="nav-item {% if request.path == signin %} active {% endif %}">
-                    <a class="nav-link" href="{{ signin }}">signin</a>
+                <li class="nav-item {% if request.path == signup %} active {% endif %}">
+                    <a class="nav-link" href="{{ signup }}">Sign up</a>
                 </li>
 
                 <li class="nav-item {% if request.path == reservedarea %} active {% endif %}">

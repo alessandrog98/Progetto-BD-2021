@@ -44,6 +44,7 @@ def create_app():
 
     context.login_manager = LoginManager(context.app)
     context.login_manager.init_app(context.app)
+    context.login_manager.login_view = 'auth.login'
 
     import models
     import context_processor

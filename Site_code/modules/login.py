@@ -3,6 +3,7 @@ import datetime
 
 from flask_login import current_user, login_user, login_required, logout_user
 from flask import render_template, redirect, url_for, request, make_response, Blueprint, flash
+from werkzeug.urls import url_parse
 
 from context import Session
 from models.users import User
@@ -16,13 +17,17 @@ def login():
     if request.method == 'GET':
         return render_template("auth/login.html")
     else:
+        next_page = request.form['next']
         user = User.get_by_email(request.form['user'])
         if user is not None and user.check_password(request.form['pass']):
             login_user(user, remember=True, duration=datetime.timedelta(minutes=20))
-            flask.flash('Logged in successfully.')
-            return redirect(url_for("front.home"))
+            default = url_for('front.home')
         else:
-            return redirect(url_for('auth.login'))
+            flask.flash('Wrong username or password')
+            default = url_for('auth.login')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = default
+        return redirect(next_page)
 
 
 @auth.route('/logout')

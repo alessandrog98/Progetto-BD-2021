@@ -20,7 +20,7 @@ def new():
 
 
 @survey.route('/<id>/answer/', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def answer(id):
     s = Session().query(Survey).filter_by(id=id).first()
     qs = sorted(s.questions, key=lambda x: x.order)
@@ -32,7 +32,15 @@ def answer(id):
             q.closed.options = sorted(q.closed.closed_question_options, key=lambda x: x.order)
         else:
             pass  # TODO exception
-    return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
+    if not s.permit_anon_answer:
+        @login_required
+        def f():
+            return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
+        return f()
+    else:
+        def f():
+            return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
+        return f()
 
 
 @survey.route('/<id>/', methods=['GET'])

@@ -55,12 +55,12 @@ def insert_answer():
     for answer_row in data['answers']:
         answer = Answer(user_id=current_user.get_id())
         if answer_row['type'] == str(AnswerTypes.OpenAnswer.value):
-            answer.open_answers.append(OpenAnswer(text=answer_row['text']))
+            answer.open_answers.append(OpenAnswer(open_question_id=answer_row['open_question_id'], text=answer_row['text']))
         elif answer_row['type'] == str(AnswerTypes.ClosedAnswer.value):
             answer.closed_answers.append(ClosedAnswer(closed_question_option_id=answer_row['closed_question_option_id']))
         else:
             pass  # TODO Exception
-        survey.answer.append(answer)
+        survey.answers.append(answer)
     session.commit()
     return data
 

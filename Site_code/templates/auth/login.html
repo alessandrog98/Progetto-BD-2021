@@ -11,6 +11,8 @@
 {% block content %}
     {% set signup = url_for('auth.sign_up') %}
     <form action="{{ login }}" method="post" id="login-form" class="form-signin">
+        <input type="hidden" name="next" value="{{ request.args.get('next') }}" />
+
         <h4 class="mb-3 mt-3 ml-1 font-weight-normal" style="text-align: center;">Log in</h4>
         <input type="text" name="user" autofocus="" maxlength="254" required="" id="id_username" class="my-form-control form-control" placeholder="Username">
         <input type="password" name="pass" required="" id="id_password" class="my-form-control form-control" placeholder="Password">

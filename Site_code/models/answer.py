@@ -63,4 +63,4 @@ trigger_SameSurvey = DDL(
     FOR EACH ROW
     EXECUTE PROCEDURE same_survey()""")
 
-event.listen(Answer, 'before_insert', trigger_SameSurvey)
+#event.listen(Answer, 'before_insert', trigger_SameSurvey)

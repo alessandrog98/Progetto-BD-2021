@@ -63,4 +63,4 @@ trigger_maxAns = DDL(
     EXECUTE PROCEDURE max_Ans();"""
 )
 
-event.listen(ClosedAnswer, 'before_insert', trigger_maxAns)
+# event.listen(ClosedAnswer, 'before_insert', trigger_maxAns)

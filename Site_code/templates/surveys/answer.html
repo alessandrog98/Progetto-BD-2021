@@ -7,6 +7,11 @@
 
 {% block content %}
     <style>
+        body
+        {
+            margin-bottom: 70px;
+        }
+
         .myLabel
         {
             width: 200px;
@@ -43,7 +48,7 @@
                         </div>
                         <div class="form mt-2">
                             <label class="font-weight-bold pr-3">Answer:</label>
-                            <input id="{{ q.id }}" class="form-control item-answer" type="text">
+                            <input id="q{{ q.id }}" class="form-control item-answer" type="text">
                         </div>
                     </div>
                 </div>
@@ -68,9 +73,9 @@
                                     <tr>
                                         <td>{{ o.text }}</td>
                                         {% if q.closed.min_n_of_answer == 1 and q.closed.max_n_of_answer == 1 %}
-                                            <td><input id="{{ o.id }}" type="radio" name="{{ q.id }}"></td>
+                                            <td><input id="o{{ o.id }}" type="radio" name="{{ q.id }}"></td>
                                         {% else %}
-                                            <td><input type="checkbox"></td>
+                                            <td><input id="o{{ o.id }}" type="checkbox"></td>
                                         {% endif %}
                                     </tr>
                                 {% endfor %}
@@ -83,10 +88,73 @@
         {% endfor %}
     </div>
 
+    <div class="row justify-content-center align-items-center fixed-bottom" style="background-color: #d3d3d3; height: 70px">
+        <div class="col-auto">
+            <div class="align-bottom" style="display: inline-block">
+                <div id="loader_save" class="loader" style="height: 25px;width: 25px;display: none;"></div>
+            </div>
+            <button id="save" class="btn btn-md btn-primary">Salva</button>
+        </div>
+    </div>
+
     <script>
+        let ItemType = {
+            OpenQuestion: {value: 1, name: "Open-ended Question"},
+            ClosedQuestion: {value: 2, name: "Closed-ended Question"},
+        };
+
+        function getData()
+        {
+            let temp;
+            let data = {};
+            data['survey_id'] = {{ survey.id }};
+            data['answers'] = [];
+
+            {% for q in questions %}
+                {% if q.get_type() == QuestionTypes.OpenQuestion %}
+                    data['answers'].push({
+                        'type': ItemType.OpenQuestion.value.toString(),
+                        'text': $('#q{{ q.id }}').val(),
+                        'open_question_id': {{ q.id }}
+                    });
+                {% elif q.get_type() == QuestionTypes.ClosedQuestion %}
+                    {% for o in q.closed.options %}
+                        temp = $('#o{{ o.id }}').is(':checked');
+                        if(temp)
+                            data['answers'].push({
+                                'type': ItemType.ClosedQuestion.value.toString(),
+                                'closed_question_option_id': {{ o.id }}
+                            });
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+            return data;
+        }
+
         'use strict';
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+            let $save = $('#save');
+            $save.click(function ()
+            {
+                $save.addClass('disabled');
+
+                $.post(
+                {
+                    url : '/answer/',
+                    data: JSON.stringify(getData()),
+                    dataType : 'json',
+                    contentType: "application/json"
+                })
+                .done(function (response)
+                {
+
+                })
+                .fail(function ()
+                {
+                    notifyDanger("Errore durante l'inserimento");
+                })
+            });
         })
     </script>
 {% endblock %}
