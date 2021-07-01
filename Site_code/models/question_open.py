@@ -12,7 +12,7 @@ class OpenQuestion(SQLBase):
 
     regex = Column(String(200), nullable=True)
     regex_description = Column(String(200), nullable=True)
-    mandatory = Column(Boolean, nullable=True)
+    mandatory = Column(Boolean)
 
     open_answers = relationship("OpenAnswer", back_populates="open_question")
 

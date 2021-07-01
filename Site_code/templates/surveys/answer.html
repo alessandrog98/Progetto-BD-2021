@@ -35,10 +35,11 @@
                 <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">{{ q.title }}</h5>
-                        <span class="text-muted">{{ q.open.regex_description }}</span>
                         {% if q.open.mandatory %}
                             <span class="text-danger">Mandatory Question</span>
+                            <br>
                         {% endif %}
+                        <span class="text-muted">{{ q.open.regex_description }}</span>
                     </div>
                     <div class="card-body">
                         <div class="mb-2">
@@ -146,7 +147,7 @@
                 })
                 .done(function (response)
                 {
-                    notifyDanger("Answer Inserted");
+                    notifySuccess("Answer Inserted");
                 })
                 .fail(function ()
                 {
