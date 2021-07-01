@@ -15,3 +15,10 @@ front = Blueprint('front', __name__)
 def home():
     return render_template("front/home.html")
 
+
+@front.route('/reserved_area')
+@login_required
+def reserved_area():
+    data = User.my_surveys(current_user.get_id())
+    return render_template("front/reserved.html", data=data)
+

@@ -35,6 +35,7 @@
                 <div class="card mt-4">
                     <div class="card-header">
                         <h5 class="mb-0">{{ q.title }}</h5>
+                        <span class="text-muted">{{ q.open.regex_description }}</span>
                         {% if q.open.mandatory %}
                             <span class="text-danger">Mandatory Question</span>
                         {% endif %}
@@ -42,9 +43,6 @@
                     <div class="card-body">
                         <div class="mb-2">
                             <span class="">{{ q.text }}</span>
-                        </div>
-                        <div class="mb-2">
-                            <span class="">{{ q.open.regex_description }}</span>
                         </div>
                         <div class="form mt-2">
                             <label class="font-weight-bold pr-3">Answer:</label>
@@ -138,22 +136,22 @@
             $save.click(function ()
             {
                 $save.addClass('disabled');
+                $save.prop('disabled', true);
 
                 $.post(
                 {
                     url : '/answer/',
                     data: JSON.stringify(getData()),
-                    dataType : 'json',
                     contentType: "application/json"
                 })
                 .done(function (response)
                 {
-
+                    notifyDanger("Answer Inserted");
                 })
                 .fail(function ()
                 {
-                    notifyDanger("Errore durante l'inserimento");
-                })
+                    notifyDanger("Something gone wrong");
+                });
             });
         })
     </script>

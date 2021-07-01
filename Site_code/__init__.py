@@ -15,7 +15,7 @@ from config import config_dict
 
 def register_blueprints(app):
     from modules.front import front
-    from modules.login import auth
+    from modules.auth import auth
     from modules.survey import survey
     from modules.answer import answer
     app.register_blueprint(front, url_prefix='/')

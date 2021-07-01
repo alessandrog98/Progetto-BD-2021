@@ -3,6 +3,31 @@
 {% block head %}
 {% endblock %}
 
-{% block content %}
+{% set survey_new = url_for('survey.new') %}
+{% set reserved_area = url_for('front.reserved_area') %}
+{% set login = url_for('auth.login') %}
+{% set signup = url_for('auth.sign_up') %}
 
+{% block content %}
+    <style>
+        .menu-link
+        {
+            margin-left: 15px;
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-auto" style="font-size: larger;">
+            {% if user is none %}
+                <span class="text-muted">Welcome to WS Surveys</span><br>
+                <a class="menu-link" href="{{ login }}">Login</a><br>
+                <a class="menu-link" href="{{ signup }}">Sign Up</a><br>
+            {% else %}
+                <span class="text-muted">Welcome {{ user.get_full_name() }}</span><br>
+                <a class="menu-link" href="{{ survey_new }}">New Survey</a><br>
+                <a class="menu-link" href="{{ reserved_area }}">My Surveys</a><br>
+            {% endif %}
+
+        </div>
+    </div>
 {% endblock %}

@@ -380,6 +380,8 @@ $(function () {
     $save.click(function ()
     {
         $save.addClass('disabled');
+        $save.prop('disabled', true);
+
         let data = {};
         data.title = $('#title').val();
         data.permit_anon_answer = $('#permit_anon_true').is(':checked');
@@ -392,16 +394,15 @@ $(function () {
         {
             url : '/survey/',
             data: JSON.stringify(data),
-            dataType : 'json',
             contentType: "application/json"
         })
         .done(function (response)
         {
-
+            location.href='/reserved_area?success=Survey inserted';
         })
         .fail(function ()
         {
-            notifyDanger("Errore durante l'inserimento");
+            notifyDanger("Something gone wrong");
         })
     });
 });

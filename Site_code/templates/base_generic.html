@@ -28,7 +28,7 @@
     {% set password_change = url_for('auth.password_change') %}
     {% set signup = url_for('auth.sign_up') %}
     {% set survey_new = url_for('survey.new') %}
-    {% set reservedarea = url_for('auth.reservedarea') %}
+    {% set reserved_area = url_for('front.reserved_area') %}
 
 
     <nav class="navbar fixed-top navbar-expand-xl navbar-dark bg-primary shadow">
@@ -49,17 +49,11 @@
                 </li>
 
                 <li class="nav-item {% if request.path == survey_new %} active {% endif %}">
-                    <a class="nav-link" href="{{ survey_new }}">Surveys</a>
+                    <a class="nav-link" href="{{ survey_new }}">New Survey</a>
                 </li>
-                <li class="nav-item {% if request.path == reservedarea %} active {% endif %}">
-                    <a class="nav-link" href="{{ reservedarea }}">reserved area</a>
+                <li class="nav-item {% if request.path == reserved_area %} active {% endif %}">
+                    <a class="nav-link" href="{{ reserved_area }}">My Surveys</a>
                 </li>
-
-                {% if user.is_superuser %}
-                    <li class="nav-item {% if request.path == "" %} active {% endif %}">
-                        <a class="nav-link" href="">ddddddddddddd</a>
-                    </li>
-                {% endif %}
             </ul>
 
             {% if user is none %}

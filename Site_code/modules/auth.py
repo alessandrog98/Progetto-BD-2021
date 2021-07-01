@@ -78,11 +78,3 @@ def sign_up():
             return redirect(url_for('auth.login'))
         flash('Email già esistente! prova ad accedere')
         return redirect(url_for('auth.login'))
-
-
-@auth.route('/reserved_area')
-@login_required
-def reservedarea():
-    data = User.my_surveys(current_user.get_id())
-    return render_template("front/reserved.html", data=data)
-

@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% set survey = url_for('survey.get_survey_all') %}
-{% set me = url_for('auth.reservedarea') %}
+{% set me = url_for('front.reserved_area') %}
 
 {% block content %}
     <h3>Welcome on your reserved area {{ user.get_full_name() }}</h3>
@@ -20,15 +20,13 @@
         </tr>
         </thead>
         <tbody>
-        {% set count = 1 %}
         {% for item in data %}
             <tr>
-                <th scope="row">{{ count }}</th>
+                <th scope="row">{{ item.id }}</th>
                 <td>{{item.title}}</td>
                 <td><a class="btn btn-primary" href="{{ survey }}{{ item.id }}/answer"><i class="fas fa-share-alt"></i></a></td>
                 <td><button class="btn btn-danger" id="delete_survey{{ item.id }}"><i class="fas fa-trash"></i></button></td>
             </tr>
-            {% set count = count + 1 %}
         {% endfor %}
         </tbody>
     </table>
@@ -40,7 +38,7 @@
             if(error && error !== "" && error !== "None")
                 notifyDanger(error)
             if(success && success !== "" && success !== "None")
-                notifyDanger(success)
+                notifySuccess(success)
 
 
             {% for item in data %}
@@ -52,11 +50,11 @@
                     })
                     .done(function (response)
                     {
-                        //location.href='{{ me }}?success=Survey deleted';
+                        location.href='{{ me }}?success=Survey deleted';
                     })
                     .fail(function ()
                     {
-                        //location.href='{{ me }}?error=Error in delete survey';
+                        location.href='{{ me }}?error=Error in delete survey';
                     })
                 });
             {% endfor %}
