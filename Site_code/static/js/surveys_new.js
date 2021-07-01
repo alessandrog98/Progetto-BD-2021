@@ -284,8 +284,7 @@ class SurveysItem {
         };
     }
 
-    getInfo(order)
-    {
+    getInfo(order){
         let out = {};
         out.order = order;
         out.title = this.$container.find('input[name="title"]').val();
@@ -371,7 +370,9 @@ class AddButton {
 }
 
 let items = [];
+
 let topAddButton = new AddButton(null);
+
 $(function () {
     $('#itemsContainer').append(topAddButton.$container);
 

@@ -69,6 +69,7 @@ def receive_after_create(target, connection, **kw):
         """DROP TRIGGER IF EXISTS MaxClosedAns ON answers_closed;
         CREATE TRIGGER MaxClosedAns
         BEFORE INSERT OR DELETE ON answers_closed 
+        REFERENCING OLD TABLE AS old, NEW TABLE AS new
         FOR EACH STATEMENT 
         EXECUTE PROCEDURE max_Ans();"""
     )
