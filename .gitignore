@@ -137,7 +137,3 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 Site_code/.idea/Site_code.iml
-Site_code/models/answer_closed.py
-Site_code/modules/login.py
-Site_code/templates/auth/signup.html
-Site_code/templates/base_generic.html
