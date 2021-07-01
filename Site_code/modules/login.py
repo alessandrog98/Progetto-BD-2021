@@ -75,12 +75,12 @@ def sign_up():
             new_user.set_password(pwd)
             s.add(new_user)
             s.commit()
-            return redirect(url_for('front.home'))
-        flash('email già esistente ! prova ad accedere')
-        return redirect(url_for('auth.sign_in'))
+            return redirect(url_for('auth.login'))
+        flash('Email già esistente! prova ad accedere')
+        return redirect(url_for('auth.login'))
 
 
-@auth.route('/reservedarea')
+@auth.route('/reserved_area')
 @login_required
 def reservedarea():
     data = User.my_surveys(current_user.get_id())

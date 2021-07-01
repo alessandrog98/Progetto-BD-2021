@@ -1,10 +1,11 @@
 {% extends "base_generic.html" %}
 
 {% block head %}
-{#    <script src="{{ static('js/reserved.js') }}"></script>#}
+    {#    <script src="{{ static('js/reserved.js') }}"></script>#}
 {% endblock %}
 
 {% set survey = url_for('survey.get_survey_all') %}
+{% set me = url_for('auth.reservedarea') %}
 
 {% block content %}
     <h3>Welcome on your reserved area {{ user.get_full_name() }}</h3>
@@ -25,10 +26,40 @@
                 <th scope="row">{{ count }}</th>
                 <td>{{item.title}}</td>
                 <td><a class="btn btn-primary" href="{{ survey }}{{ item.id }}/answer"><i class="fas fa-share-alt"></i></a></td>
-                <td><a class="btn btn-danger" href=""><i class="fas fa-trash"></i></a></td>
+                <td><button class="btn btn-danger" id="delete_survey{{ item.id }}"><i class="fas fa-trash"></i></button></td>
             </tr>
             {% set count = count + 1 %}
         {% endfor %}
         </tbody>
     </table>
+
+    <script>
+        $(function () {
+            let error = "{{ request.args.get('error') }}";
+            let success = "{{ request.args.get('success') }}";
+            if(error && error !== "" && error !== "None")
+                notifyDanger(error)
+            if(success && success !== "" && success !== "None")
+                notifyDanger(success)
+
+
+            {% for item in data %}
+                $('#delete_survey{{ item.id }}').click(function ()
+                {
+                    $.ajax({
+                        type: 'DELETE',
+                        url : '{{ survey }}{{ item.id }}/',
+                    })
+                    .done(function (response)
+                    {
+                        //location.href='{{ me }}?success=Survey deleted';
+                    })
+                    .fail(function ()
+                    {
+                        //location.href='{{ me }}?error=Error in delete survey';
+                    })
+                });
+            {% endfor %}
+        });
+    </script>
 {% endblock %}

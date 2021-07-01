@@ -16,10 +16,10 @@ class Answer(SQLBase):
 
     id = Column(Integer, primary_key=True)
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     user = relationship("User", back_populates="answers")
 
-    survey_id = Column(Integer, ForeignKey("surveys.id"))
+    survey_id = Column(Integer, ForeignKey("surveys.id", ondelete="CASCADE"))
     survey = relationship("Survey", back_populates="answers")
 
     closed_answers = relationship("ClosedAnswer", back_populates="answer")

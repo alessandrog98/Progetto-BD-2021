@@ -9,7 +9,7 @@
 {% set login = url_for('auth.login') %}
 
 {% block content %}
-    {% set signup = url_for('auth.sign_in') %}
+    {% set signup = url_for('auth.sign_up') %}
     <form action="{{ login }}" method="post" id="login-form" class="form-signin">
         <input type="hidden" name="next" value="{{ request.args.get('next') }}" />
 
