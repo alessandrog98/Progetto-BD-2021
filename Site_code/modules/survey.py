@@ -114,19 +114,33 @@ def delete_survey(id):
             return flask.Response(status=401)
 
 
-@survey.route('<id>/summary_questions/', methods=['GET', 'POST'])
+@survey.route('/<id>/summary_questions/', methods=['GET', 'POST'])
 @login_required
 def summary_questions(id):
     s = Session().query(Survey).get(id)
+    answers = {}
     if s is None:
         return flask.Response(status=404)
-    qs = sorted(s.questions, key=lambda x: x.order)
-    for q in qs:
+    general_quests = sorted(s.questions, key=lambda x: x.order)
+    for q in general_quests:
         if q.get_type() == QuestionTypes.OpenQuestion:
-            q.open = q.open_question
+            open_answer = q.open_question.open_answers
+            list = []
+            list.append({'answer_type': 'open'})
+            for oq in open_answer:
+                list.append({'text': oq.text})
+            answers[q.open_question.id] = list
         elif q.get_type() == QuestionTypes.ClosedQuestion:
-            q.closed = q.closed_question
-            q.closed.options = sorted(q.closed.closed_question_options, key=lambda x: x.order)
+            quest_closed = q.closed_question
+            closed_options = sorted(quest_closed.closed_question_options, key=lambda x: x.order)
+            list = []
+            list.append({'answer_type': 'closed'})
+            for cqo in closed_options:
+                count=0
+                for cqa in cqo.closed_answers:
+                    count = count+1
+                list.append({cqo.text: count})
+            answers[q.id] = list
         else:
             pass  # TODO exception
-    return render_template("surveys/summary_survey.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
+    return render_template("surveys/summary_survey.html", survey=s, questions=general_quests, data=json.dumps(answers), QuestionTypes=QuestionTypes)

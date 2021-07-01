@@ -33,8 +33,9 @@ class Answer(SQLBase):
         else:
             return None  # TODO ExceptionAns
 
-
-SameSurvey = DDL(
+@event.listens_for(Answer.__table__, 'after_create')
+def receive_after_create(target, connection, **kw):
+    connection.execute(
     """CREATE OR REPLACE FUNCTION same_survey()
     RETURNS TRIGGER as $$
     BEGIN
