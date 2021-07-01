@@ -62,10 +62,10 @@ def password_change():
             return render_template("auth/password_change_form.html")
 
 
-@auth.route('/sign_up', methods=['GET', 'POST'])
-def sign_up():
+@auth.route('/sign_in', methods=['GET', 'POST'])
+def sign_in():
     if request.method == 'GET':
-        return render_template("auth/sign.html")
+        return render_template("auth/signin.html")
     else:
         email = request.form['user']
         pwd = request.form['pass']
@@ -77,7 +77,7 @@ def sign_up():
             s.commit()
             return redirect(url_for('front.home'))
         flash('email già esistente ! prova ad accedere')
-        return redirect(url_for('auth.sign_up'))
+        return redirect(url_for('auth.sign_in'))
 
 
 @auth.route('/reservedarea')

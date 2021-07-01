@@ -19,38 +19,47 @@ class ClosedAnswer(SQLBase):
 maxAns = DDL(
     """CREATE OR REPLACE FUNCTION max_Ans() 
     RETURNS TRIGGER as $$
-    DECLARE my_cursor refcursor;
+    DECLARE my_cursorGen refcursor;
+    DECLARE my_cursorIn refcursor;
     DECLARE idQ integer;
     DECLARE idA integer;
     DECLARE numAns integer;
     DECLARE diffNumAns integer;
     BEGIN
-       OPEN my_cursor FOR  (SELECT DISTINCT qco.closed_question_id, n.answer_id
-                            FROM new AS n
-                            INNER JOIN questions_closed_options AS qco ON qco.id = n.closed_question_option_id);
-       FETCH NEXT FROM my_cursor INTO idQ, idA;
-       WHILE FOUND LOOP
-            numAns = (SELECT COUNT(*) FROM answers_closed WHERE closed_question_option_id = idQ AND answer_id = idA);
-            diffNumAns = (SELECT COUNT(*) FROM new WHERE closed_question_option_id = idQ AND answer_id = idA);
-            IF TG_OP = 'DELETE' THEN
-                diffNumAns = -diffNumAns;
-            END IF;
-            
-            IF ((numAns+diffNumAns) > (SELECT q.max_n_of_answer 
-                        FROM questions_closed AS q 
-                        INNER JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id
-                        WHERE qc.id = idQ)
-               OR numAns<(SELECT q.min_n_of_answer
-                           FROM questions_closed AS q
-                           INNER JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id
-                           WHERE qc.id = idQ)) THEN
-                   CLOSE my_cursor;
-                   RETURN NULL;
-            END IF;
-            FETCH NEXT FROM my_cursor INTO idQ, idA;
-       END LOOP;
-       CLOSE my_cursor;
-       RETURN NEW;
+        OPEN my_cursorGen FOR (SELECT DISTINCT n.answer_id
+                               FROM new AS n);
+        FETCH NEXT FROM my_cursorGen INTO idA;  
+        WHILE FOUND LOOP
+           OPEN my_cursorIn FOR (SELECT DISTINCT qco.closed_question_id
+                                FROM new AS n
+                                INNER JOIN questions_closed_options AS qco ON qco.id = n.closed_question_option_id);
+           FETCH NEXT FROM my_cursorIn INTO idQ;
+           WHILE FOUND LOOP
+                numAns = (SELECT COUNT(*) FROM answers_closed WHERE closed_question_option_id = idQ AND answer_id = idA);
+                diffNumAns = (SELECT COUNT(*) FROM new WHERE closed_question_option_id = idQ AND answer_id = idA);
+                IF TG_OP = 'DELETE' THEN
+                    diffNumAns = -diffNumAns;
+                END IF;
+                
+                IF ((numAns+diffNumAns) > (SELECT q.max_n_of_answer 
+                            FROM questions_closed AS q 
+                            INNER JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id
+                            WHERE qc.id = idQ)
+                   OR numAns<(SELECT q.min_n_of_answer
+                               FROM questions_closed AS q
+                               INNER JOIN questions_closed_option AS qc ON q.id=qc.closed_question_id
+                               WHERE qc.id = idQ)) THEN
+                       CLOSE my_cursorIn;
+                       CLOSE my_cursorGen;
+                       RETURN NULL;
+                END IF;
+                FETCH NEXT FROM my_cursorIn INTO idQ;
+           END LOOP;
+           CLOSE my_cursorIn;
+           FETCH NEXT FROM my_cursorGen INTO idA;  
+        END LOOP;   
+        CLOSE my_cursorGen;
+        RETURN NEW;
     END;
     $$ LANGUAGE plpgsql"""
 )

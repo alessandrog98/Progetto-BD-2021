@@ -5,7 +5,7 @@
 
 {% block navbar %}{% endblock %}
 
-{% set signup = url_for('auth.sign_up') %}
+{% set signin = url_for('auth.sign_in') %}
 {% set login = url_for('auth.login') %}
 
 {% block content %}
@@ -16,7 +16,7 @@ p
         <input type="password" name="pass" required="" id="id_password" class="my-form-control form-control" placeholder="Password">
         <input type="hidden" name="next" value="{{ next }}" />
         <div class="btn-group-vertical btn-block">
-            <button type="submit" class="btn btn-lg btn-primary">Sign up</button>
+            <button type="submit" class="btn btn-lg btn-primary">Sign in</button>
         </div>
             <br>
             <P class="mb-3 mt-3 ml-1 font-weight-normal" style="text-align: center;"> or </P>
