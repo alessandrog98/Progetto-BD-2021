@@ -20,34 +20,39 @@ def new():
 
 
 @survey.route('/<id>/answer/', methods=['GET', 'POST'])
-#@login_required
 def answer(id):
-    s = Session().query(Survey).filter_by(id=id).first()
-    qs = sorted(s.questions, key=lambda x: x.order)
-    for q in qs:
-        if q.get_type() == QuestionTypes.OpenQuestion:
-            q.open = q.open_question
-        elif q.get_type() == QuestionTypes.ClosedQuestion:
-            q.closed = q.closed_question
-            q.closed.options = sorted(q.closed.closed_question_options, key=lambda x: x.order)
-        else:
-            pass  # TODO exception
-    if not s.permit_anon_answer:
-        @login_required
-        def f():
-            return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
-        return f()
+    s = Session().query(Survey).get(id)
+    if s is None:
+        return flask.Response(status=404)
     else:
-        def f():
-            return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
-        return f()
+        qs = sorted(s.questions, key=lambda x: x.order)
+        for q in qs:
+            if q.get_type() == QuestionTypes.OpenQuestion:
+                q.open = q.open_question
+            elif q.get_type() == QuestionTypes.ClosedQuestion:
+                q.closed = q.closed_question
+                q.closed.options = sorted(q.closed.closed_question_options, key=lambda x: x.order)
+            else:
+                pass  # TODO exception
+        if not s.permit_anon_answer:
+            @login_required
+            def f():
+                return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
+            return f()
+        else:
+            def f():
+                return render_template("surveys/answer.html", survey=s, questions=qs, QuestionTypes=QuestionTypes)
+            return f()
 
 
 @survey.route('/<id>/', methods=['GET'])
 # @login_required
 def get_survey(id):
-    row = Session().query(Survey).filter_by(id=id).first()
-    return json.dumps({"permit_anon_answer": row.permit_anon_answer, "title:": row.title, "author_id": row.author_id})
+    s = Session().query(Survey).get(id)
+    if s is None:
+        return flask.Response(status=404)
+    else:
+        return json.dumps({"permit_anon_answer": s.permit_anon_answer, "title:": s.title, "author_id": s.author_id})
 
 
 @survey.route('/', methods=['GET'])
@@ -98,19 +103,22 @@ def insert_survey():
 def delete_survey(id):
     session = Session()
     survey = session.query(Survey).get(id)
-    if (current_user.get_id() == survey.author_id):
-            session.query(Survey).filter_by(id = id).delete()
-            session.commit()
-            flash('Survey eliminato correttamente!')
-            return
-    flash('Non sei il propietario del survey!')
-    return
+    if survey is None:
+        return flask.Response(status=404)
+    elif current_user.get_id() == survey.author_id:
+        session.query(Survey).filter_by(id=id).delete()
+        session.commit()
+        return flask.Response(status=200)
+    else:
+        return flask.Response(status=301)
 
 
 @survey.route('<id>/summary_questions/', methods=['GET', 'POST'])
 @login_required
 def summary_questions(id):
-    s = Session().query(Survey).filter_by(id=id).first()
+    s = Session().query(Survey).get(id)
+    if s is None:
+        return flask.Response(status=404)
     qs = sorted(s.questions, key=lambda x: x.order)
     for q in qs:
         if q.get_type() == QuestionTypes.OpenQuestion:

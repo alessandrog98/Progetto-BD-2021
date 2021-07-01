@@ -25,7 +25,7 @@ def login():
         else:
             flask.flash('Wrong username or password')
             default = url_for('auth.login')
-        if not next_page or url_parse(next_page).netloc != '':
+        if not next_page or next_page == 'None' or url_parse(next_page).netloc != '':
             next_page = default
         return redirect(next_page)
 
@@ -62,10 +62,10 @@ def password_change():
             return render_template("auth/password_change_form.html")
 
 
-@auth.route('/sign_in', methods=['GET', 'POST'])
-def sign_in():
+@auth.route('/sign_up', methods=['GET', 'POST'])
+def sign_up():
     if request.method == 'GET':
-        return render_template("auth/signin.html")
+        return render_template("auth/signup.html")
     else:
         email = request.form['user']
         pwd = request.form['pass']

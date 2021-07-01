@@ -63,9 +63,3 @@ def insert_answer():
         survey.answers.append(answer)
     session.commit()
     return data
-
-
-# @answer.route('/', methods=['GET'])
-# @login_required
-# def answer():
-#     return render_template("surveys/answer.html")

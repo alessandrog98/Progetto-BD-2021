@@ -26,7 +26,7 @@
     {% set login = url_for('auth.login') %}
     {% set logout = url_for('auth.logout') %}
     {% set password_change = url_for('auth.password_change') %}
-    {% set signin = url_for('auth.sign_in') %}
+    {% set signup = url_for('auth.sign_up') %}
     {% set survey_new = url_for('survey.new') %}
     {% set reservedarea = url_for('auth.reservedarea') %}
 
@@ -51,11 +51,6 @@
                 <li class="nav-item {% if request.path == survey_new %} active {% endif %}">
                     <a class="nav-link" href="{{ survey_new }}">Surveys</a>
                 </li>
-                {% if user is none %}
-                <li class="nav-item {% if request.path == signin %} active {% endif %}">
-                    <a class="nav-link" href="{{ signin }}">Sign in</a>
-                </li>
-                {% endif %}
                 <li class="nav-item {% if request.path == reservedarea %} active {% endif %}">
                     <a class="nav-link" href="{{ reservedarea }}">reserved area</a>
                 </li>
@@ -68,9 +63,14 @@
             </ul>
 
             {% if user is none %}
-                <ul class="navbar-nav navbar-right">
+                <ul class="navbar-nav navbar-right mr-1 ">
                     <li class="nav-item">
                         <a class="btn btn-sm btn-light nav-link" href="{{ login }}" style="color:#000000;">Login</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav navbar-right">
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-light nav-link" href="{{ signup }}" style="color:#000000;">Sign up</a>
                     </li>
                 </ul>
             {% else %}
