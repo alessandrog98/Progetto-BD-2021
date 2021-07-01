@@ -105,12 +105,13 @@ def delete_survey(id):
     survey = session.query(Survey).get(id)
     if survey is None:
         return flask.Response(status=404)
-    elif current_user.get_id() == survey.author_id:
-        session.query(Survey).filter_by(id=id).delete()
-        session.commit()
-        return flask.Response(status=200)
     else:
-        return flask.Response(status=301)
+        if current_user.get_id() == str(survey.author_id):
+            session.query(Survey).filter_by(id=id).delete()
+            session.commit()
+            return flask.Response(status=200)
+        else:
+            return flask.Response(status=401)
 
 
 @survey.route('<id>/summary_questions/', methods=['GET', 'POST'])

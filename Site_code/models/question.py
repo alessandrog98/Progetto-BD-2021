@@ -19,7 +19,7 @@ class Question(SQLBase):
     title = Column(String(150))
     text = Column(Text)
 
-    survey_id = Column(Integer, ForeignKey("surveys.id"))
+    survey_id = Column(Integer, ForeignKey("surveys.id", ondelete="CASCADE"))
     survey = relationship("Survey", back_populates="questions")
 
     closed_question = relationship("ClosedQuestion", uselist=False, back_populates="question")

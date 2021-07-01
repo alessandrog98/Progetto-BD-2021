@@ -11,9 +11,8 @@ class Survey(SQLBase):
     permit_anon_answer = Column(Boolean)
     title = Column(String(250))
 
-    author_id = Column(Integer, ForeignKey("users.id"))
+    author_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
     author = relationship("User", back_populates="surveys")
 
     questions = relationship("Question", back_populates="survey")
     answers = relationship("Answer", back_populates="survey")
-    CheckConstraint('(SELECT COUNT(quesitons))>=(SELECT COUNT(answers))', name='check_option')

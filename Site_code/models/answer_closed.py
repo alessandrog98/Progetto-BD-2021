@@ -9,10 +9,10 @@ class ClosedAnswer(SQLBase):
 
     id = Column(Integer, primary_key=True)
 
-    closed_question_option_id = Column(Integer, ForeignKey("questions_closed_options.id"))
+    closed_question_option_id = Column(Integer, ForeignKey("questions_closed_options.id", ondelete="CASCADE"))
     closed_question_option = relationship("ClosedQuestionOption", back_populates="closed_answers")
 
-    answer_id = Column(Integer, ForeignKey("answers.id"))
+    answer_id = Column(Integer, ForeignKey("answers.id", ondelete="CASCADE"))
     answer = relationship("Answer", back_populates="closed_answers")
 
 

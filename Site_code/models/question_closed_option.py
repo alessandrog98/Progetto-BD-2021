@@ -11,7 +11,7 @@ class ClosedQuestionOption(SQLBase):
     order = Column(Integer)
     text = Column(Text)
 
-    closed_question_id = Column(Integer, ForeignKey("questions_closed.id"))
+    closed_question_id = Column(Integer, ForeignKey("questions_closed.id", ondelete="CASCADE"))
     closed_question = relationship("ClosedQuestion", back_populates="closed_question_options")
 
     closed_answers = relationship("ClosedAnswer", back_populates="closed_question_option")
