@@ -46,15 +46,15 @@ def receive_after_create(target, connection, **kw):
             IF EXISTS (
                 SELECT *
                 FROM answers_closed AS ac
-                  INNER JOIN question_closed_option AS qco ON ac.closed_question_option_id = qco.id
-                  INNER JOIN question AS q ON q.id = qco.closed_question_id
+                  INNER JOIN questions_closed_options AS qco ON ac.closed_question_option_id = qco.id
+                  INNER JOIN questions AS q ON q.id = qco.closed_question_id
                 WHERE ac.answer_id = NEW.id 
                     AND q.survey_id <> NEW.survey_id) 
                 
             OR EXISTS (	
                 SELECT *
                 FROM answers_open AS ao
-                  INNER JOIN question AS q ON q.id = ao.open_question_id
+                INNER JOIN questions AS q ON q.id = ao.open_question_id
                 WHERE ao.answer_id = NEW.id 
                     AND q.survey_id <> NEW.survey_id) THEN
                 
@@ -95,6 +95,7 @@ def receive_after_create(target, connection, **kw):
                         FETCH NEXT FROM my_cursor INTO idQ;
                    END LOOP;
                    CLOSE my_cursor;
+                   RETURN NULL;
             END;
             $$ LANGUAGE plpgsql""")
 

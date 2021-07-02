@@ -25,3 +25,25 @@ class ClosedQuestion(SQLBase):
 @event.listens_for(ClosedQuestion.__table__, 'after_create')
 def receive_after_create(target, connection, **kw):
     denyUpdate(connection, ClosedQuestion.__tablename__)
+
+    connection.execute("""
+                CREATE OR REPLACE FUNCTION max_quest() 
+                RETURNS TRIGGER as $$
+                DECLARE numOpt integer;
+                DECLARE idS integer;
+                BEGIN
+                    idS = (SELECT q.survey_id FROM questions AS q WHERE q.id = NEW.id) ;
+                    numOpt = (SELECT COUNT(*) FROM questions_closed_options WHERE closed_question_id = NEW.id);
+                    IF (NEW.min_n_of_answer >= numOpt OR NEW.max_n_of_answer >= numOpt) THEN
+                        DELETE FROM surveys WHERE id = idS;
+                    END IF;
+                    RETURN NULL;
+                END;
+                $$ LANGUAGE plpgsql""")
+
+    # connection.execute(""" # Need to be translated in after statement
+    #             DROP TRIGGER IF EXISTS TrigMaxMinClosedQuestion ON questions_closed;
+    #             CREATE TRIGGER TrigMaxMinClosedQuestion
+    #             AFTER INSERT ON questions_closed
+    #             FOR EACH ROW
+    #             EXECUTE PROCEDURE max_quest()""")

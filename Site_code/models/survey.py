@@ -25,3 +25,25 @@ class Survey(SQLBase):
 @event.listens_for(Survey.__table__, 'after_create')
 def receive_after_create(target, connection, **kw):
     denyUpdate(connection, Survey.__tablename__)
+
+    connection.execute(
+        """ CREATE OR REPLACE FUNCTION HasQuestions()
+            RETURNS TRIGGER as $$ 
+            BEGIN
+                IF (NOT EXISTS (SELECT q.*
+                                FROM questions AS q
+                                WHERE survey_id = new.id )) THEN 
+                                DELETE FROM surveys
+                                WHERE id = new.id;
+                                RETURN NULL;
+                END IF;
+                RETURN NULL;
+            END;
+            $$ LANGUAGE plpgsql""")
+
+    # connection.execute("""
+    #             DROP TRIGGER IF EXISTS TrigHasQuestions ON surveys;
+    #             CREATE TRIGGER TrigHasQuestions
+    #             AFTER INSERT ON surveys
+    #             FOR EACH ROW
+    #             EXECUTE PROCEDURE HasQuestions()""")

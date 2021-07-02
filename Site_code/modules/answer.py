@@ -14,7 +14,7 @@ answer = Blueprint('answer', __name__)
 
 
 @answer.route('/<id>/', methods=['GET'])
-# @login_required
+@login_required
 def get_answer(id):
     quest = Session().query(Question).get(id)
     data = {}
@@ -37,7 +37,7 @@ def get_answer(id):
 
 
 @answer.route('/answers_all/<id>/', methods=['GET'])
-# @login_required
+@login_required
 def get_answers_all(id):
     quest = Session().query(Question).filter_by(survey_id=id)
     data = {}

@@ -42,4 +42,3 @@ class Question(SQLBase):
 @event.listens_for(Question.__table__, 'after_create')
 def receive_after_create(target, connection, **kw):
     denyUpdate(connection, Question.__tablename__)
-
