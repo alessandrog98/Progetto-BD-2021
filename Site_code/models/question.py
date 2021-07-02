@@ -1,9 +1,10 @@
 from enum import Enum
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, Text, CheckConstraint
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, Text, CheckConstraint, event
 from sqlalchemy.orm import relationship
 
 from context import SQLBase, Session
+from .utils import denyUpdate
 
 
 class QuestionTypes(Enum):
@@ -36,4 +37,9 @@ class Question(SQLBase):
             return QuestionTypes.OpenQuestion
         else:
             return None  # TODO Exception
+
+
+@event.listens_for(Question.__table__, 'after_create')
+def receive_after_create(target, connection, **kw):
+    denyUpdate(connection, Question.__tablename__)
 

@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, F
 from sqlalchemy.orm import relationship
 
 from context import SQLBase, Session
+from .utils import denyUpdate
 
 
 class OpenAnswer(SQLBase):
@@ -19,6 +20,8 @@ class OpenAnswer(SQLBase):
 
 @event.listens_for(OpenAnswer.__table__, 'after_create')
 def receive_after_create(target, connection, **kw):
+    denyUpdate(connection, OpenAnswer.__tablename__)
+
     connection.execute(
         """ CREATE OR REPLACE FUNCTION regex() 
             RETURNS TRIGGER as $$ 
@@ -36,7 +39,11 @@ def receive_after_create(target, connection, **kw):
                         RETURN OLD;
                     END IF;
                 ELSE
-                    RETURN NEW;
+                    IF (LENGTH(new.text) = 0 OR (regex IS NULL OR new.text ~ CONCAT('^', regex, '$')) ) THEN
+                        RETURN NEW;
+                    ELSE
+                        RETURN OLD;
+                    END IF;
                 END IF;
             END;
             $$ LANGUAGE plpgsql""")

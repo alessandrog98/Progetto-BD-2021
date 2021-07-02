@@ -14,7 +14,7 @@ class User(UserMixin, SQLBase):
     )
 
     id = Column(Integer, primary_key=True)
-    email = Column(String(80), unique=True, index=True)
+    email = Column(String(80), index=True)
     name = Column(String(80))
     password = Column(String(100))
 

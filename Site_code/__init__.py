@@ -23,6 +23,7 @@ def register_blueprints(app):
     app.register_blueprint(survey, url_prefix='/survey')
     app.register_blueprint(answer, url_prefix='/answer')
 
+
 def create_app():
     DEV = config('Dev', default=True)
 

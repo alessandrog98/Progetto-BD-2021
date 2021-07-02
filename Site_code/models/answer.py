@@ -4,6 +4,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, F
 from sqlalchemy.orm import relationship
 
 from context import SQLBase, Session
+from .utils import denyUpdate
 
 
 class AnswerTypes(Enum):
@@ -36,6 +37,8 @@ class Answer(SQLBase):
 
 @event.listens_for(Answer.__table__, 'after_create')
 def receive_after_create(target, connection, **kw):
+    denyUpdate(connection, Answer.__tablename__)
+
     connection.execute(""" 
             CREATE OR REPLACE FUNCTION same_survey()
             RETURNS TRIGGER as $$
@@ -104,9 +107,7 @@ def receive_after_create(target, connection, **kw):
 
     connection.execute("""
             DROP TRIGGER IF EXISTS TrigMaxMinClosedAnswer ON answers;
-            CREATE TRIGGER TrigSameSurvey
+            CREATE TRIGGER TrigMaxMinClosedAnswer
             AFTER INSERT ON answers
             FOR EACH ROW
             EXECUTE PROCEDURE max_Ans()""")
-
-# event.listen(Answer, 'before_insert', trigger_SameSurvey)

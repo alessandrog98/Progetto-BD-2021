@@ -1,7 +1,8 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, CheckConstraint
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, CheckConstraint, event
 from sqlalchemy.orm import relationship
 
 from context import SQLBase, Session
+from .utils import denyUpdate
 
 
 class Survey(SQLBase):
@@ -19,3 +20,8 @@ class Survey(SQLBase):
 
     questions = relationship("Question", back_populates="survey")
     answers = relationship("Answer", back_populates="survey")
+
+
+@event.listens_for(Survey.__table__, 'after_create')
+def receive_after_create(target, connection, **kw):
+    denyUpdate(connection, Survey.__tablename__)

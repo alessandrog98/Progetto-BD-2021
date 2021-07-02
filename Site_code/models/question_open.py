@@ -1,7 +1,8 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, Text, event
 from sqlalchemy.orm import relationship
 
 from context import SQLBase, Session
+from .utils import denyUpdate
 
 
 class OpenQuestion(SQLBase):
@@ -15,4 +16,8 @@ class OpenQuestion(SQLBase):
     mandatory = Column(Boolean)
 
     open_answers = relationship("OpenAnswer", back_populates="open_question")
+
+@event.listens_for(OpenQuestion.__table__, 'after_create')
+def receive_after_create(target, connection, **kw):
+    denyUpdate(connection, OpenQuestion.__tablename__)
 
