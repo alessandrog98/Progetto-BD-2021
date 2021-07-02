@@ -6,6 +6,9 @@ from context import SQLBase, Session
 
 class Survey(SQLBase):
     __tablename__ = 'surveys'
+    __table_args__ = (
+        CheckConstraint('LENGTH(title) > 0'),
+    )
 
     id = Column(Integer, primary_key=True)
     permit_anon_answer = Column(Boolean)

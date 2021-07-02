@@ -1,4 +1,7 @@
+import tempfile
+
 import flask
+import xlsxwriter
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, request, make_response, Blueprint, flash
 from models.survey import Survey
@@ -121,6 +124,9 @@ def summary_questions(id):
     answers = {}
     if s is None:
         return flask.Response(status=404)
+    if current_user.get_id() != str(s.author_id):
+        return flask.Response(status=401)
+
     questions = sorted(s.questions, key=lambda x: x.order)
     for q in questions:
         if q.get_type() == QuestionTypes.OpenQuestion:
@@ -145,3 +151,65 @@ def summary_questions(id):
                            questions=questions,
                            data=json.dumps(answers),
                            QuestionTypes=QuestionTypes)
+
+
+@survey.route('/<id>/download/', methods=['GET', 'POST'])
+@login_required
+def summary_questions(id):
+    s = Session().query(Survey).get(id)
+    if s is None:
+        return flask.Response(status=404)
+    if current_user.get_id() != str(s.author_id):
+        return flask.Response(status=401)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        dir = tmpdir + '/ragazzi.xlsx'
+        workbook = xlsxwriter.Workbook(dir)
+        worksheet = workbook.add_worksheet()
+
+        worksheet.write(0, 0, 'ID')
+        worksheet.write(0, 1, 'Cognome')
+        worksheet.write(0, 2, 'Nome')
+        worksheet.write(0, 3, 'Telefono')
+        worksheet.write(0, 4, 'Telefono 2')
+        worksheet.write(0, 5, 'Data Nascita')
+        worksheet.write(0, 6, 'Paese')
+        worksheet.write(0, 7, 'Indirizzo')
+        worksheet.write(0, 8, 'Taglia')
+        worksheet.write(0, 9, 'Quota')
+        worksheet.write(0, 10, 'Anticipato')
+        worksheet.write(0, 11, 'Posticipato')
+        worksheet.write(0, 12, 'Laboratorio 1')
+        worksheet.write(0, 13, 'Laboratorio 2')
+        worksheet.write(0, 14, 'Laboratorio 3')
+        worksheet.write(0, 15, 'Laboratorio 4')
+
+        i = 2
+        for ragazzo in queryset:
+            worksheet.write(i, 0, str(ragazzo.pk))
+            worksheet.write(i, 1, str(ragazzo.cognome))
+            worksheet.write(i, 2, str(ragazzo.nome))
+            if ragazzo.telefono is not None:
+                worksheet.write(i, 3, str(ragazzo.telefono))
+            if ragazzo.telefono_2 is not None:
+                worksheet.write(i, 4, str(ragazzo.telefono_2))
+            worksheet.write(i, 5, str(ragazzo.data_nascita))
+            worksheet.write(i, 6, str(ragazzo.paese))
+            worksheet.write(i, 7, str(ragazzo.indirizzo))
+            worksheet.write(i, 8, str(ragazzo.taglia))
+            worksheet.write(i, 9, str(ragazzo.quota))
+            # if ragazzo.quota_anticipato is not None:
+            worksheet.write(i, 10, ('Elementari' if ragazzo.quota_anticipato == 0 else 'Medie'))
+            worksheet.write(i, 11, str(ragazzo.quota_posticipato))
+            if ragazzo.laboratorio1 is not None:
+                worksheet.write(i, 12, str(ragazzo.laboratorio1.nome))
+            if ragazzo.laboratorio2 is not None:
+                worksheet.write(i, 13, str(ragazzo.laboratorio2.nome))
+            if ragazzo.laboratorio3 is not None:
+                worksheet.write(i, 14, str(ragazzo.laboratorio3.nome))
+            if ragazzo.laboratorio4 is not None:
+                worksheet.write(i, 15, str(ragazzo.laboratorio4.nome))
+            i += 1
+
+        workbook.close()
+        return download(request, dir)

@@ -8,3 +8,4 @@ python-dotenv
 python-decouple
 flask_sqlalchemy
 psycopg2
+xlsxwriter

@@ -6,6 +6,10 @@ from context import SQLBase, Session
 
 class ClosedQuestion(SQLBase):
     __tablename__ = 'questions_closed'
+    __table_args__ = (
+        CheckConstraint('min_n_of_answer >= 0'),
+        CheckConstraint('max_n_of_answer >= min_n_of_answer')
+    )
 
     id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"), primary_key=True)
     question = relationship("Question", back_populates="closed_question")

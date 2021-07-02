@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, DDL, event
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Float, Date, Table, DDL, event, CheckConstraint
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from context import SQLBase, login_manager, Session
@@ -8,9 +8,13 @@ from models.survey import Survey
 
 class User(UserMixin, SQLBase):
     __tablename__ = 'users'
+    __table_args__ = (
+        CheckConstraint('LENGTH(email) > 0'),
+        CheckConstraint('LENGTH(name) > 0'),
+    )
 
     id = Column(Integer, primary_key=True)
-    email = Column(String(80))
+    email = Column(String(80), unique=True, index=True)
     name = Column(String(80))
     password = Column(String(100))
 

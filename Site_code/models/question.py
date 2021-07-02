@@ -13,6 +13,10 @@ class QuestionTypes(Enum):
 
 class Question(SQLBase):
     __tablename__ = 'questions'
+    __table_args__ = (
+        CheckConstraint('LENGTH(title) > 0'),
+        CheckConstraint('LENGTH(text) > 0'),
+    )
 
     id = Column(Integer, primary_key=True)
     order = Column(Integer)

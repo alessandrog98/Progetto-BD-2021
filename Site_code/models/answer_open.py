@@ -28,11 +28,15 @@ def receive_after_create(target, connection, **kw):
             BEGIN
                 mandatory = (SELECT q.mandatory FROM questions_open AS q WHERE q.id = new.open_question_id);
                 regex = (SELECT q.regex FROM questions_open AS q WHERE q.id = new.open_question_id);
-
-                IF (NOT mandatory OR regex IS NULL OR new.text ~ CONCAT('^', regex, '$')) THEN
-                    RETURN NEW;
+                
+                IF (mandatory) THEN
+                    IF (LENGTH(new.text) > 0 AND (regex IS NULL OR new.text ~ CONCAT('^', regex, '$')) ) THEN
+                        RETURN NEW;
+                    ELSE
+                        RETURN OLD;
+                    END IF;
                 ELSE
-                    RETURN OLD;
+                    RETURN NEW;
                 END IF;
             END;
             $$ LANGUAGE plpgsql""")
