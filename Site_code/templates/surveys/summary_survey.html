@@ -2,20 +2,12 @@
 
 {% block head %}
     <script>const data = {{ data | tojson }} </script>
-    {    <script src="{{ static('js/summary_survey.js') }}"></script>}
+    <script src="{{ static('js/summary_survey.js') }}"></script>
 {% endblock %}
 
 
 {% block content %}
     <style>
-        .myLabel
-        {
-            width: 200px;
-            padding-right: 10px;
-            padding-left: 20px;
-            display: block!important;
-            text-align: right;
-        }
         canvas{
             max-width: 1000px; !important;
             max-height: 1000px;!important;
@@ -29,10 +21,11 @@
     </style>
 
     <h3>{{ survey.title }}</h3>
+    <h6>N.Answers {{ survey.answers|length }}</h6>
     {% if survey.permit_anon_answer %}
-        <h6 class="text-muted">This answer is Anonymous</h6>
+        <h6 class="text-muted">This survey is Anonymous</h6>
     {% else %}
-        <h6 class="text-muted">This answer will be posted under the name ...</h6>
+        <h6 class="text-muted">This survey is not Anonymous</h6>
     {% endif %}
 
     <div id="itemsContainer" class="col-xl-10 ml-auto mr-auto">
@@ -43,14 +36,29 @@
                         <h5 class="mb-0">{{ q.title }}</h5>
                         {% if q.open.mandatory %}
                             <span class="text-danger">Mandatory Question</span>
+                            <br>
                         {% endif %}
+                        <span class="text-muted">{{ q.open.regex_description }}</span>
                     </div>
                     <div class="card-body">
                         <div class="mb-2">
                             <span class="">{{ q.text }}</span>
                         </div>
-                        <div class="mb-2">
-                            <span class="">{{ q.open.regex_description }}</span>
+                        <div class="table-responsive" style="max-height: 300px;">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Answers</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for answer in q.answers %}
+                                    <tr>
+                                        <td>{{ answer }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -59,9 +67,9 @@
                     <div class="card-header">
                         <h5 class="mb-0">{{ q.title }}</h5>
                         {% if q.closed.min_n_of_answer == q.closed.max_n_of_answer %}
-                            <span class="text-muted">Select {{ q.closed.max_n_of_answer }} answer</span>
+                            <span class="text-muted">{{ q.closed.max_n_of_answer }} answer permitted</span>
                         {% else %}
-                            <span class="text-muted">From {{ q.closed.min_n_of_answer }} to {{ q.closed.max_n_of_answer }} answer</span>
+                            <span class="text-muted">From {{ q.closed.min_n_of_answer }} to {{ q.closed.max_n_of_answer }} answer permitted</span>
                         {% endif %}
                     </div>
                     <div class="card-body">

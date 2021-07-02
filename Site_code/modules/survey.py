@@ -121,32 +121,27 @@ def summary_questions(id):
     answers = {}
     if s is None:
         return flask.Response(status=404)
-    general_quests = sorted(s.questions, key=lambda x: x.order)
-    for q in general_quests:
+    questions = sorted(s.questions, key=lambda x: x.order)
+    for q in questions:
         if q.get_type() == QuestionTypes.OpenQuestion:
             q.open = q.open_question
-            open_answer = q.open_question.open_answers
-            dict = {}
-            list = []
-            dict['answer_type'] = 'open'
-            for oq in open_answer:
-                list.append(oq.text)
-            dict['data'] = list
-            answers[q.open_question.id] = dict
+            q.answers = []
+            for oq in q.open_question.open_answers:
+                q.answers.append(oq.text)
         elif q.get_type() == QuestionTypes.ClosedQuestion:
             q.closed = q.closed_question
-            quest_closed = q.closed_question
-            closed_options = sorted(quest_closed.closed_question_options, key=lambda x: x.order)
-            list = []
-            dict = {}
-            dict['answer_type'] = 'closed'
+            closed_options = sorted(q.closed_question.closed_question_options, key=lambda x: x.order)
+            answers[q.id] = {}
+            answers[q.id]['answer_type'] = 'closed'
+            my_list = []
             for cqo in closed_options:
-                count=0
-                for cqa in cqo.closed_answers:
-                    count = count+1
-                list.append({cqo.text: count})
-            dict['data'] = list
-            answers[q.id] = dict
+                my_list.append({cqo.text: len(cqo.closed_answers)})
+            answers[q.id]['data'] = my_list
         else:
             pass  # TODO exception
-    return render_template("surveys/summary_survey.html", survey=s, questions=general_quests, data=json.dumps(answers), QuestionTypes=QuestionTypes)
+    return render_template("surveys/summary_survey.html",
+                           survey=s,
+                           answer_count=len(s.answers),
+                           questions=questions,
+                           data=json.dumps(answers),
+                           QuestionTypes=QuestionTypes)

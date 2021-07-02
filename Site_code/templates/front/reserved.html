@@ -16,6 +16,7 @@
             <th scope="col">#</th>
             <th scope="col">Title</th>
             <th scope="col">Share</th>
+            <th scope="col">Results</th>
             <th scope="col">Delete</th>
         </tr>
         </thead>
@@ -24,7 +25,8 @@
             <tr>
                 <th scope="row">{{ item.id }}</th>
                 <td>{{item.title}}</td>
-                <td><a class="btn btn-primary" href="{{ survey }}{{ item.id }}/answer"><i class="fas fa-share-alt"></i></a></td>
+                <td><a class="btn btn-success" href="{{ survey }}{{ item.id }}/answer/"><i class="fas fa-share-alt"></i></a></td>
+                <td><a class="btn btn-primary" href="{{ survey }}{{ item.id }}/summary_questions/"><i class="fas fa-poll"></i></a></td>
                 <td><button class="btn btn-danger" id="delete_survey{{ item.id }}"><i class="fas fa-trash"></i></button></td>
             </tr>
         {% endfor %}
