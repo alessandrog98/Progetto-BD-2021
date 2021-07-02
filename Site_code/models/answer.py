@@ -36,36 +36,77 @@ class Answer(SQLBase):
 
 @event.listens_for(Answer.__table__, 'after_create')
 def receive_after_create(target, connection, **kw):
-    connection.execute(
-        """ CREATE OR REPLACE FUNCTION same_survey()
+    connection.execute(""" 
+            CREATE OR REPLACE FUNCTION same_survey()
             RETURNS TRIGGER as $$
             BEGIN
-                IF (new.id IN (SELECT answer_id FROM answers_closed)) THEN
-                   IF (new.survey_id = (SELECT q.survey_id
-                                        FROM answers_closed AS ac
-                                        INNER JOIN question_closed_option AS qco ON ac.closed_question_option_id = qco.id
-                                        INNER JOIN question AS q ON q.id = qco.closed_question_id
-                                        WHERE ac.id = new.id)) THEN
-                       RETURN NEW;
-                    END IF;
-                ELSE IF (new.id IN (SELECT answer_id FROM answers_open)) THEN
-                    IF (new.survey_id = (SELECT q.survey_id
-                                        FROM answer_open AS ao
-                                        INNER JOIN question AS q ON ao.open_question_id = q.id
-                                        WHERE ao.id = new.id)) THEN
-                       RETURN NEW;
-                    END IF;
-               END IF;
-               RETURN NULL;
+            IF EXISTS (
+                SELECT *
+                FROM answers_closed AS ac
+                  INNER JOIN question_closed_option AS qco ON ac.closed_question_option_id = qco.id
+                  INNER JOIN question AS q ON q.id = qco.closed_question_id
+                WHERE ac.answer_id = NEW.id 
+                    AND q.survey_id <> NEW.survey_id) 
+                
+            OR EXISTS (	
+                SELECT *
+                FROM answers_open AS ao
+                  INNER JOIN question AS q ON q.id = ao.open_question_id
+                WHERE ao.answer_id = NEW.id 
+                    AND q.survey_id <> NEW.survey_id) THEN
+                
+                DELETE FROM answers WHERE id = NEW.id;
+                
+            END IF; 	
+              
+              RETURN NULL;
             END;
             $$ LANGUAGE plpgsql""")
 
+    connection.execute("""
+    CREATE OR REPLACE FUNCTION max_Ans() 
+            RETURNS TRIGGER as $$
+            DECLARE my_cursor refcursor;
+            DECLARE idQ integer;
+            DECLARE numAns integer;
+            BEGIN
+                   OPEN my_cursor FOR (SELECT DISTINCT qc.id
+                                        FROM questions_closed AS qc
+                                        INNER JOIN questions AS q ON q.id = qc.id
+                                        WHERE q.survey_id = NEW.survey_id);
+                   FETCH NEXT FROM my_cursor INTO idQ;
+                   WHILE FOUND LOOP
+                        numAns = (SELECT COUNT(*) FROM answers_closed WHERE closed_question_option_id = idQ AND answer_id = NEW.survey_id);
+                        
+                        IF (numAns > (SELECT q.max_n_of_answer 
+                                    FROM questions_closed AS q
+                                    WHERE q.id = idQ)
+                        OR numAns < (SELECT q.min_n_of_answer
+                                       FROM questions_closed AS q
+                                       WHERE q.id = idQ)) THEN
+                               
+                            CLOSE my_cursor;
+                            DELETE FROM answers WHERE id = NEW.id;
+                            RETURN NULL;
+                        END IF;
+                        FETCH NEXT FROM my_cursor INTO idQ;
+                   END LOOP;
+                   CLOSE my_cursor;
+            END;
+            $$ LANGUAGE plpgsql""")
 
-trigger_SameSurvey = DDL(
-    """DROP TRIGGER IF EXISTS TrigSameSurvey ON answers;
-    CREATE TRIGGER TrigSameSurvey
-    AFTER INSERT OR UPDATE ON answers
-    FOR EACH ROW
-    EXECUTE PROCEDURE same_survey()""")
+    connection.execute("""
+            DROP TRIGGER IF EXISTS TrigSameSurvey ON answers;
+            CREATE TRIGGER TrigSameSurvey
+            AFTER INSERT ON answers
+            FOR EACH ROW
+            EXECUTE PROCEDURE same_survey()""")
+
+    connection.execute("""
+            DROP TRIGGER IF EXISTS TrigMaxMinClosedAnswer ON answers;
+            CREATE TRIGGER TrigSameSurvey
+            AFTER INSERT ON answers
+            FOR EACH ROW
+            EXECUTE PROCEDURE max_Ans()""")
 
 # event.listen(Answer, 'before_insert', trigger_SameSurvey)
