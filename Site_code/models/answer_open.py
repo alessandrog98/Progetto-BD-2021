@@ -33,13 +33,13 @@ def receive_after_create(target, connection, **kw):
                 regex = (SELECT q.regex FROM questions_open AS q WHERE q.id = new.open_question_id);
                 
                 IF (mandatory) THEN
-                    IF (LENGTH(new.text) > 0 AND (regex IS NULL OR new.text ~ CONCAT('^', regex, '$')) ) THEN
+                    IF (LENGTH(new.text) > 0 AND (regex IS NULL OR regex = '' OR new.text ~ CONCAT('^', regex, '$')) ) THEN
                         RETURN NEW;
                     ELSE
                         RETURN OLD;
                     END IF;
                 ELSE
-                    IF (LENGTH(new.text) = 0 OR (regex IS NULL OR new.text ~ CONCAT('^', regex, '$')) ) THEN
+                    IF (LENGTH(new.text) = 0 OR (regex IS NULL OR regex = '' OR new.text ~ CONCAT('^', regex, '$')) ) THEN
                         RETURN NEW;
                     ELSE
                         RETURN OLD;

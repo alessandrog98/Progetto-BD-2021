@@ -99,16 +99,16 @@ def receive_after_create(target, connection, **kw):
             END;
             $$ LANGUAGE plpgsql""")
 
-    connection.execute("""
-            DROP TRIGGER IF EXISTS TrigSameSurvey ON answers;
-            CREATE TRIGGER TrigSameSurvey
-            AFTER INSERT ON answers
-            FOR EACH ROW
-            EXECUTE PROCEDURE same_survey()""")
-
-    connection.execute("""
-            DROP TRIGGER IF EXISTS TrigMaxMinClosedAnswer ON answers;
-            CREATE TRIGGER TrigMaxMinClosedAnswer
-            AFTER INSERT ON answers
-            FOR EACH ROW
-            EXECUTE PROCEDURE max_Ans()""")
+    # connection.execute("""
+    #         DROP TRIGGER IF EXISTS TrigSameSurvey ON answers;
+    #         CREATE TRIGGER TrigSameSurvey
+    #         AFTER INSERT ON answers
+    #         FOR EACH ROW
+    #         EXECUTE PROCEDURE same_survey()""")
+    #
+    # connection.execute("""
+    #         DROP TRIGGER IF EXISTS TrigMaxMinClosedAnswer ON answers;
+    #         CREATE TRIGGER TrigMaxMinClosedAnswer
+    #         AFTER INSERT ON answers
+    #         FOR EACH ROW
+    #         EXECUTE PROCEDURE max_Ans()""")
