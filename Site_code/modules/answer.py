@@ -16,14 +16,14 @@ answer = Blueprint('answer', __name__)
 @answer.route('/<id>/', methods=['GET'])
 # @login_required
 def get_answer(id):
-    quest = Session().query(Question).filter_by(id=id).first()
+    quest = Session().query(Question).get(id)
     data = {}
-    if quest.get_type == QuestionTypes.OpenQuestion:
-        quest = Session().query(OpenQuestion).filter_by(id=id).first()
-        for ans in quest.open_answer:
+    if quest.get_type() == QuestionTypes.OpenQuestion:
+        quest = Session().query(OpenQuestion).get(id)
+        for ans in quest.answer:
             data[quest.id] = {ans.text}
         return json.dumps(data)
-    elif quest.get_type == QuestionTypes.ClosedQuestion:
+    elif quest.get_type() == QuestionTypes.ClosedQuestion:
         quest = Session().query(ClosedQuestionOption).filter_by(closed_question_id=id)
         all_q = []
         for q in quest:

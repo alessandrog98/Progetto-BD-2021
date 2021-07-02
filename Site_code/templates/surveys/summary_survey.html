@@ -1,7 +1,8 @@
 {% extends "base_generic.html" %}
 
 {% block head %}
-    {#    <script src="{{ static('js/surveys_new.js') }}"></script>#}
+    <script>const data = {{ data | tojson }} </script>
+    {    <script src="{{ static('js/summary_survey.js') }}"></script>}
 {% endblock %}
 
 
@@ -14,6 +15,16 @@
             padding-left: 20px;
             display: block!important;
             text-align: right;
+        }
+        canvas{
+            max-width: 1000px; !important;
+            max-height: 1000px;!important;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 10px;
+            display: block;
         }
     </style>
 
@@ -69,6 +80,7 @@
                             </table>
                         </div>
                     </div>
+                <canvas id="myChart{{ q.id }}" ></canvas>
                 </div>
             {% endif %}
         {% endfor %}

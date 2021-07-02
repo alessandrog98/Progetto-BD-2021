@@ -124,23 +124,29 @@ def summary_questions(id):
     general_quests = sorted(s.questions, key=lambda x: x.order)
     for q in general_quests:
         if q.get_type() == QuestionTypes.OpenQuestion:
+            q.open = q.open_question
             open_answer = q.open_question.open_answers
+            dict = {}
             list = []
-            list.append({'answer_type': 'open'})
+            dict['answer_type'] = 'open'
             for oq in open_answer:
-                list.append({'text': oq.text})
-            answers[q.open_question.id] = list
+                list.append(oq.text)
+            dict['data'] = list
+            answers[q.open_question.id] = dict
         elif q.get_type() == QuestionTypes.ClosedQuestion:
+            q.closed = q.closed_question
             quest_closed = q.closed_question
             closed_options = sorted(quest_closed.closed_question_options, key=lambda x: x.order)
             list = []
-            list.append({'answer_type': 'closed'})
+            dict = {}
+            dict['answer_type'] = 'closed'
             for cqo in closed_options:
                 count=0
                 for cqa in cqo.closed_answers:
                     count = count+1
                 list.append({cqo.text: count})
-            answers[q.id] = list
+            dict['data'] = list
+            answers[q.id] = dict
         else:
             pass  # TODO exception
     return render_template("surveys/summary_survey.html", survey=s, questions=general_quests, data=json.dumps(answers), QuestionTypes=QuestionTypes)
